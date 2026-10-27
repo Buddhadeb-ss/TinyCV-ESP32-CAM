@@ -13,8 +13,6 @@ env/
 venv/
 ENV/
 
-# Large media recordings
-Video_recording/
-*.mp4
+# Temporary media recordings (test.mp4 is tracked)
 *.mkv
 *.avi

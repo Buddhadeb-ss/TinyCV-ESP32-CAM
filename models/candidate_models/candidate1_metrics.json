@@ -1,0 +1,66 @@
+{
+  "candidate": "Candidate 1 (TinyDeskClassifier)",
+  "input_resolution": "48x48x3 (RGB)",
+  "total_parameters": 4302,
+  "best_val_acc": 0.7,
+  "test_acc": 0.5925925925925926,
+  "test_samples": 27,
+  "classes": [
+    "background",
+    "cream_container",
+    "mouse",
+    "earbuds_case",
+    "glue_stick",
+    "microcontroller_board"
+  ],
+  "confusion_matrix": [
+    [
+      15,
+      1,
+      1,
+      2,
+      2,
+      0
+    ],
+    [
+      1,
+      0,
+      0,
+      1,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      0,
+      1,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      1,
+      1,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      0,
+      1,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ]
+  ]
+}

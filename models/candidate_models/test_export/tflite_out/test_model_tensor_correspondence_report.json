@@ -1,0 +1,239 @@
+{
+  "schema_version": 1,
+  "summary": {
+    "total_onnx_node_outputs": 5,
+    "direct_count": 4,
+    "rewritten_count": 1,
+    "inferred_count": 0,
+    "missing_count": 0,
+    "rewritten_but_missing_count": 0,
+    "lineage_event_count": 14
+  },
+  "lineage_events": [
+    {
+      "kind": "prune_unused_tensors",
+      "removed_names": [
+        "input_onnx_ncx_internal",
+        "input_onnx_ncx_internal_perm",
+        "conv1.weight",
+        "val_8",
+        "val_12",
+        "fc.weight",
+        "fc.bias",
+        "node_Conv_16_input_nhwc"
+      ],
+      "event_index": 0
+    },
+    {
+      "kind": "prune_unused_tensors",
+      "removed_names": [
+        "__nhwc_to_nchw_perm_rank4__"
+      ],
+      "event_index": 1
+    },
+    {
+      "kind": "replace_input",
+      "src_name": "conv2d",
+      "dst_name": "node_Conv_16_output_nhwc",
+      "source": "set_operator_inputs",
+      "event_index": 2
+    },
+    {
+      "kind": "prune_unused_tensors",
+      "removed_names": [
+        "conv2d",
+        "conv2d_perm"
+      ],
+      "event_index": 3
+    },
+    {
+      "kind": "prune_unused_tensors",
+      "removed_names": [
+        "__nhwc_to_nchw_perm_rank4__"
+      ],
+      "event_index": 4
+    },
+    {
+      "kind": "prune_unused_tensors",
+      "removed_names": [
+        "__nhwc_to_nchw_perm_rank4__"
+      ],
+      "event_index": 5
+    },
+    {
+      "kind": "prune_unused_tensors",
+      "removed_names": [
+        "__nhwc_to_nchw_perm_rank4__"
+      ],
+      "event_index": 6
+    },
+    {
+      "kind": "rename_tensor",
+      "old_name": "node_Conv_16_output_nhwc",
+      "new_name": "relu",
+      "source": "set_operator_outputs",
+      "event_index": 7
+    },
+    {
+      "kind": "fuse_conv_activation",
+      "conv_op_type": "CONV_2D",
+      "activation_op_type": "RELU",
+      "fused_activation": "RELU",
+      "conv_output": "node_Conv_16_output_nhwc",
+      "fused_output": "relu",
+      "event_index": 8
+    },
+    {
+      "kind": "prune_unused_tensors",
+      "removed_names": [
+        "node_Conv_16_output_nhwc"
+      ],
+      "event_index": 9
+    },
+    {
+      "kind": "prune_unused_tensors",
+      "removed_names": [
+        "__nhwc_to_nchw_perm_rank4__"
+      ],
+      "event_index": 10
+    },
+    {
+      "kind": "prune_unused_tensors",
+      "removed_names": [
+        "__nhwc_to_nchw_perm_rank4__"
+      ],
+      "event_index": 11
+    },
+    {
+      "kind": "prune_unused_tensors",
+      "removed_names": [
+        "__nhwc_to_nchw_perm_rank4__"
+      ],
+      "event_index": 12
+    },
+    {
+      "kind": "prune_unused_tensors",
+      "removed_names": [
+        "__nhwc_to_nchw_perm_rank4__"
+      ],
+      "event_index": 13
+    }
+  ],
+  "records": [
+    {
+      "identifier": 1,
+      "onnx_op_type": "Conv",
+      "onnx_op_name": "node_Conv_16",
+      "onnx_output_index": 0,
+      "onnx_output_name": "conv2d",
+      "resolved_tflite_tensor_name": "relu",
+      "exists_in_final_model": true,
+      "is_graph_output": false,
+      "consumer_count": 1,
+      "producer_operator_index": 1,
+      "producer_op_type": "CONV_2D",
+      "assume_channel_last_layout": false,
+      "status": "rewritten",
+      "is_rewritten": true,
+      "rewrite_events": [
+        {
+          "event_index": 2,
+          "kind": "replace_input",
+          "from": "conv2d",
+          "to": "node_Conv_16_output_nhwc"
+        },
+        {
+          "event_index": 7,
+          "kind": "rename_tensor",
+          "from": "node_Conv_16_output_nhwc",
+          "to": "relu"
+        }
+      ],
+      "rewrite_name_chain": [
+        "conv2d",
+        "node_Conv_16_output_nhwc",
+        "relu"
+      ]
+    },
+    {
+      "identifier": 2,
+      "onnx_op_type": "Relu",
+      "onnx_op_name": "node_relu",
+      "onnx_output_index": 0,
+      "onnx_output_name": "relu",
+      "resolved_tflite_tensor_name": "relu",
+      "exists_in_final_model": true,
+      "is_graph_output": false,
+      "consumer_count": 1,
+      "producer_operator_index": 1,
+      "producer_op_type": "CONV_2D",
+      "assume_channel_last_layout": false,
+      "status": "direct",
+      "is_rewritten": false,
+      "rewrite_events": [],
+      "rewrite_name_chain": [
+        "relu"
+      ]
+    },
+    {
+      "identifier": 3,
+      "onnx_op_type": "ReduceMean",
+      "onnx_op_name": "node_mean",
+      "onnx_output_index": 0,
+      "onnx_output_name": "mean",
+      "resolved_tflite_tensor_name": "mean",
+      "exists_in_final_model": true,
+      "is_graph_output": false,
+      "consumer_count": 1,
+      "producer_operator_index": 2,
+      "producer_op_type": "MEAN",
+      "assume_channel_last_layout": false,
+      "status": "direct",
+      "is_rewritten": false,
+      "rewrite_events": [],
+      "rewrite_name_chain": [
+        "mean"
+      ]
+    },
+    {
+      "identifier": 4,
+      "onnx_op_type": "Reshape",
+      "onnx_op_name": "node_view",
+      "onnx_output_index": 0,
+      "onnx_output_name": "view",
+      "resolved_tflite_tensor_name": "view",
+      "exists_in_final_model": true,
+      "is_graph_output": false,
+      "consumer_count": 1,
+      "producer_operator_index": 3,
+      "producer_op_type": "RESHAPE",
+      "assume_channel_last_layout": false,
+      "status": "direct",
+      "is_rewritten": false,
+      "rewrite_events": [],
+      "rewrite_name_chain": [
+        "view"
+      ]
+    },
+    {
+      "identifier": 5,
+      "onnx_op_type": "Gemm",
+      "onnx_op_name": "node_linear",
+      "onnx_output_index": 0,
+      "onnx_output_name": "output",
+      "resolved_tflite_tensor_name": "output",
+      "exists_in_final_model": true,
+      "is_graph_output": true,
+      "consumer_count": 0,
+      "producer_operator_index": 4,
+      "producer_op_type": "FULLY_CONNECTED",
+      "assume_channel_last_layout": false,
+      "status": "direct",
+      "is_rewritten": false,
+      "rewrite_events": [],
+      "rewrite_name_chain": [
+        "output"
+      ]
+    }
+  ]
+}

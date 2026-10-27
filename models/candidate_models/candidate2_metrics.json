@@ -1,0 +1,13 @@
+{
+  "candidate": "Candidate 2 (TinyFOMO Centroid Detector)",
+  "input_resolution": "96x96x3 (RGB)",
+  "output_grid": "12x12x6 (Spatial Centroid Logits)",
+  "total_parameters": 7246,
+  "best_val_f1": 0.0,
+  "test_precision": 0.0,
+  "test_recall": 0.0,
+  "test_f1": 0.0,
+  "test_tp": 0,
+  "test_fp": 1,
+  "test_fn": 6
+}

@@ -1,0 +1,917 @@
+{
+  "sample_count": 10,
+  "tensor_ranges": {
+    "input": {
+      "min": -4.320749759674072,
+      "max": 4.108860969543457,
+      "num_samples": 30
+    },
+    "node_Conv_16_input_nhwc_padded": {
+      "min": -4.320749759674072,
+      "max": 4.108860969543457,
+      "num_samples": 10
+    },
+    "node_Conv_16_conv_filter": {
+      "min": -0.1916973888874054,
+      "max": 0.192252978682518,
+      "num_samples": 10
+    },
+    "node_Conv_16_conv_bias": {
+      "min": 0.0,
+      "max": 0.0,
+      "num_samples": 10
+    },
+    "relu": {
+      "min": 0.0,
+      "max": 1.8070096969604492,
+      "num_samples": 10
+    },
+    "mean": {
+      "min": 0.0819544568657875,
+      "max": 0.3387872278690338,
+      "num_samples": 10
+    },
+    "view": {
+      "min": 0.0819544568657875,
+      "max": 0.3387872278690338,
+      "num_samples": 10
+    },
+    "output": {
+      "min": -0.10581047087907791,
+      "max": 0.2909659743309021,
+      "num_samples": 10
+    },
+    "node_linear_fc_weights": {
+      "min": -0.24912017583847046,
+      "max": 0.23618769645690918,
+      "num_samples": 10
+    },
+    "node_linear_fc_bias": {
+      "min": -0.15060800313949585,
+      "max": 0.21667668223381042,
+      "num_samples": 10
+    }
+  },
+  "variants": {
+    "integer_quant": {
+      "mode": "integer_float_io",
+      "strict": true,
+      "supported_ops": [
+        "ABS",
+        "ADD",
+        "ARG_MAX",
+        "AVERAGE_POOL_2D",
+        "BATCH_MATMUL",
+        "CAST",
+        "CONCATENATION",
+        "CONV_2D",
+        "DEPTHWISE_CONV_2D",
+        "DEPTH_TO_SPACE",
+        "DIV",
+        "EXP",
+        "EXPAND_DIMS",
+        "FULLY_CONNECTED",
+        "GATHER",
+        "GATHER_ND",
+        "HARD_SWISH",
+        "LEAKY_RELU",
+        "LESS",
+        "LOGICAL_NOT",
+        "LOGISTIC",
+        "MAXIMUM",
+        "MAX_POOL_2D",
+        "MEAN",
+        "MINIMUM",
+        "MUL",
+        "NEG",
+        "PAD",
+        "PRELU",
+        "REDUCE_MAX",
+        "REDUCE_MIN",
+        "REDUCE_PROD",
+        "RELU",
+        "RELU6",
+        "RELU_N1_TO_1",
+        "RESHAPE",
+        "RESIZE_BILINEAR",
+        "RESIZE_NEAREST_NEIGHBOR",
+        "SCATTER_ND",
+        "SELECT",
+        "SELECT_V2",
+        "SHAPE",
+        "SLICE",
+        "SOFTMAX",
+        "SPACE_TO_DEPTH",
+        "SPLIT",
+        "SQUEEZE",
+        "STRIDED_SLICE",
+        "SUB",
+        "SUM",
+        "TANH",
+        "TILE",
+        "TOPK_V2",
+        "TRANSPOSE",
+        "TRANSPOSE_CONV",
+        "WHERE"
+      ],
+      "tensor_ranges": {
+        "input": {
+          "min": -4.320749759674072,
+          "max": 4.108860969543457,
+          "num_samples": 30
+        },
+        "node_Conv_16_input_nhwc_padded": {
+          "min": -4.320749759674072,
+          "max": 4.108860969543457,
+          "num_samples": 10
+        },
+        "node_Conv_16_conv_filter": {
+          "min": -0.1916973888874054,
+          "max": 0.192252978682518,
+          "num_samples": 10
+        },
+        "node_Conv_16_conv_bias": {
+          "min": 0.0,
+          "max": 0.0,
+          "num_samples": 10
+        },
+        "relu": {
+          "min": 0.0,
+          "max": 1.8070096969604492,
+          "num_samples": 10
+        },
+        "mean": {
+          "min": 0.0819544568657875,
+          "max": 0.3387872278690338,
+          "num_samples": 10
+        },
+        "view": {
+          "min": 0.0819544568657875,
+          "max": 0.3387872278690338,
+          "num_samples": 10
+        },
+        "output": {
+          "min": -0.10581047087907791,
+          "max": 0.2909659743309021,
+          "num_samples": 10
+        },
+        "node_linear_fc_weights": {
+          "min": -0.24912017583847046,
+          "max": 0.23618769645690918,
+          "num_samples": 10
+        },
+        "node_linear_fc_bias": {
+          "min": -0.15060800313949585,
+          "max": 0.21667668223381042,
+          "num_samples": 10
+        }
+      },
+      "quantized_tensors": {
+        "input_quantized_internal": {
+          "dtype": "INT8",
+          "kind": "activation",
+          "qparams": {
+            "scale": [
+              0.033057296977323646
+            ],
+            "zero_point": [
+              3
+            ],
+            "quantized_dimension": 0,
+            "min": [
+              -4.320749759674072
+            ],
+            "max": [
+              4.108860969543457
+            ]
+          }
+        },
+        "node_Conv_16_input_nhwc_padded": {
+          "dtype": "INT8",
+          "kind": "activation",
+          "qparams": {
+            "scale": [
+              0.033057296977323646
+            ],
+            "zero_point": [
+              3
+            ],
+            "quantized_dimension": 0,
+            "min": [
+              -4.320749759674072
+            ],
+            "max": [
+              4.108860969543457
+            ]
+          }
+        },
+        "relu": {
+          "dtype": "INT8",
+          "kind": "activation",
+          "qparams": {
+            "scale": [
+              0.0013285773641922894
+            ],
+            "zero_point": [
+              -128
+            ],
+            "quantized_dimension": 0,
+            "min": [
+              0.0
+            ],
+            "max": [
+              0.3387872278690338
+            ]
+          }
+        },
+        "node_Conv_16_conv_filter": {
+          "dtype": "INT8",
+          "kind": "weight",
+          "qparams": {
+            "scale": [
+              0.001289913896471262,
+              0.001437170198187232,
+              0.0014713366981595755,
+              0.0013824404450133443,
+              0.0014958615647628903,
+              0.001456892117857933,
+              0.0015138030285015702,
+              0.0014054997591301799,
+              0.0014768546679988503,
+              0.0014534613583236933,
+              0.0013903145445510745,
+              0.0014671130338683724,
+              0.0015098294243216515,
+              0.0015062683960422873,
+              0.0015094282571226358,
+              0.0014696891885250807
+            ],
+            "zero_point": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "quantized_dimension": 0,
+            "min": null,
+            "max": null
+          }
+        },
+        "node_Conv_16_conv_bias": {
+          "dtype": "INT32",
+          "kind": "bias",
+          "qparams": {
+            "scale": [
+              4.264106675082722e-05,
+              4.750896204843441e-05,
+              4.863841418469589e-05,
+              4.569974434426958e-05,
+              4.944913998333092e-05,
+              4.8160915403951696e-05,
+              5.004223627834834e-05,
+              4.6462022939123206e-05,
+              4.8820823352384715e-05,
+              4.8047503767170546e-05,
+              4.596004079111734e-05,
+              4.8498791259889074e-05,
+              4.991087966490243e-05,
+              4.9793161695526844e-05,
+              4.989761816166701e-05,
+              4.858395196943539e-05
+            ],
+            "zero_point": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "quantized_dimension": 0,
+            "min": null,
+            "max": null
+          }
+        },
+        "mean": {
+          "dtype": "INT8",
+          "kind": "activation",
+          "qparams": {
+            "scale": [
+              0.0013285773641922894
+            ],
+            "zero_point": [
+              -128
+            ],
+            "quantized_dimension": 0,
+            "min": [
+              0.0
+            ],
+            "max": [
+              0.3387872278690338
+            ]
+          }
+        },
+        "view": {
+          "dtype": "INT8",
+          "kind": "activation",
+          "qparams": {
+            "scale": [
+              0.0013285773641922894
+            ],
+            "zero_point": [
+              -128
+            ],
+            "quantized_dimension": 0,
+            "min": [
+              0.0
+            ],
+            "max": [
+              0.3387872278690338
+            ]
+          }
+        },
+        "output": {
+          "dtype": "INT8",
+          "kind": "activation",
+          "qparams": {
+            "scale": [
+              0.0015559860596469804
+            ],
+            "zero_point": [
+              -60
+            ],
+            "quantized_dimension": 0,
+            "min": [
+              -0.10581047087907791
+            ],
+            "max": [
+              0.2909659743309021
+            ]
+          }
+        },
+        "node_linear_fc_weights": {
+          "dtype": "INT8",
+          "kind": "weight",
+          "qparams": {
+            "scale": [
+              0.0017447187565267086,
+              0.0018905802862718701,
+              0.0018597455928102136,
+              0.0017971611814573407,
+              0.001961576286703348,
+              0.001815096358768642
+            ],
+            "zero_point": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "quantized_dimension": 0,
+            "min": null,
+            "max": null
+          }
+        },
+        "node_linear_fc_bias": {
+          "dtype": "INT32",
+          "kind": "bias",
+          "qparams": {
+            "scale": [
+              2.3179938468031033e-06,
+              2.511782173528985e-06,
+              2.4708158977640204e-06,
+              2.3876676654892945e-06,
+              2.6061058526504328e-06,
+              2.4114959360878646e-06
+            ],
+            "zero_point": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "quantized_dimension": 0,
+            "min": null,
+            "max": null
+          }
+        }
+      },
+      "quantized_ops": [
+        {
+          "index": 0,
+          "op_type": "PAD",
+          "inputs": [
+            "input_quantized_internal",
+            "node_Conv_16_pads_nhwc"
+          ],
+          "outputs": [
+            "node_Conv_16_input_nhwc_padded"
+          ]
+        },
+        {
+          "index": 1,
+          "op_type": "CONV_2D",
+          "inputs": [
+            "node_Conv_16_input_nhwc_padded",
+            "node_Conv_16_conv_filter",
+            "node_Conv_16_conv_bias"
+          ],
+          "outputs": [
+            "relu"
+          ]
+        },
+        {
+          "index": 2,
+          "op_type": "MEAN",
+          "inputs": [
+            "relu",
+            "mean_mean_axes"
+          ],
+          "outputs": [
+            "mean"
+          ]
+        },
+        {
+          "index": 3,
+          "op_type": "RESHAPE",
+          "inputs": [
+            "mean",
+            "view_reshape_shape"
+          ],
+          "outputs": [
+            "view"
+          ]
+        },
+        {
+          "index": 4,
+          "op_type": "FULLY_CONNECTED",
+          "inputs": [
+            "view",
+            "node_linear_fc_weights",
+            "node_linear_fc_bias"
+          ],
+          "outputs": [
+            "output"
+          ]
+        }
+      ],
+      "failures": []
+    },
+    "full_integer_quant": {
+      "mode": "full_integer",
+      "strict": true,
+      "supported_ops": [
+        "ABS",
+        "ADD",
+        "ARG_MAX",
+        "AVERAGE_POOL_2D",
+        "BATCH_MATMUL",
+        "CAST",
+        "CONCATENATION",
+        "CONV_2D",
+        "DEPTHWISE_CONV_2D",
+        "DEPTH_TO_SPACE",
+        "DIV",
+        "EXP",
+        "EXPAND_DIMS",
+        "FULLY_CONNECTED",
+        "GATHER",
+        "GATHER_ND",
+        "HARD_SWISH",
+        "LEAKY_RELU",
+        "LESS",
+        "LOGICAL_NOT",
+        "LOGISTIC",
+        "MAXIMUM",
+        "MAX_POOL_2D",
+        "MEAN",
+        "MINIMUM",
+        "MUL",
+        "NEG",
+        "PAD",
+        "PRELU",
+        "REDUCE_MAX",
+        "REDUCE_MIN",
+        "REDUCE_PROD",
+        "RELU",
+        "RELU6",
+        "RELU_N1_TO_1",
+        "RESHAPE",
+        "RESIZE_BILINEAR",
+        "RESIZE_NEAREST_NEIGHBOR",
+        "SCATTER_ND",
+        "SELECT",
+        "SELECT_V2",
+        "SHAPE",
+        "SLICE",
+        "SOFTMAX",
+        "SPACE_TO_DEPTH",
+        "SPLIT",
+        "SQUEEZE",
+        "STRIDED_SLICE",
+        "SUB",
+        "SUM",
+        "TANH",
+        "TILE",
+        "TOPK_V2",
+        "TRANSPOSE",
+        "TRANSPOSE_CONV",
+        "WHERE"
+      ],
+      "tensor_ranges": {
+        "input": {
+          "min": -4.320749759674072,
+          "max": 4.108860969543457,
+          "num_samples": 30
+        },
+        "node_Conv_16_input_nhwc_padded": {
+          "min": -4.320749759674072,
+          "max": 4.108860969543457,
+          "num_samples": 10
+        },
+        "node_Conv_16_conv_filter": {
+          "min": -0.1916973888874054,
+          "max": 0.192252978682518,
+          "num_samples": 10
+        },
+        "node_Conv_16_conv_bias": {
+          "min": 0.0,
+          "max": 0.0,
+          "num_samples": 10
+        },
+        "relu": {
+          "min": 0.0,
+          "max": 1.8070096969604492,
+          "num_samples": 10
+        },
+        "mean": {
+          "min": 0.0819544568657875,
+          "max": 0.3387872278690338,
+          "num_samples": 10
+        },
+        "view": {
+          "min": 0.0819544568657875,
+          "max": 0.3387872278690338,
+          "num_samples": 10
+        },
+        "output": {
+          "min": -0.10581047087907791,
+          "max": 0.2909659743309021,
+          "num_samples": 10
+        },
+        "node_linear_fc_weights": {
+          "min": -0.24912017583847046,
+          "max": 0.23618769645690918,
+          "num_samples": 10
+        },
+        "node_linear_fc_bias": {
+          "min": -0.15060800313949585,
+          "max": 0.21667668223381042,
+          "num_samples": 10
+        }
+      },
+      "quantized_tensors": {
+        "input": {
+          "dtype": "INT8",
+          "kind": "activation",
+          "qparams": {
+            "scale": [
+              0.033057296977323646
+            ],
+            "zero_point": [
+              3
+            ],
+            "quantized_dimension": 0,
+            "min": [
+              -4.320749759674072
+            ],
+            "max": [
+              4.108860969543457
+            ]
+          }
+        },
+        "node_Conv_16_input_nhwc_padded": {
+          "dtype": "INT8",
+          "kind": "activation",
+          "qparams": {
+            "scale": [
+              0.033057296977323646
+            ],
+            "zero_point": [
+              3
+            ],
+            "quantized_dimension": 0,
+            "min": [
+              -4.320749759674072
+            ],
+            "max": [
+              4.108860969543457
+            ]
+          }
+        },
+        "relu": {
+          "dtype": "INT8",
+          "kind": "activation",
+          "qparams": {
+            "scale": [
+              0.0013285773641922894
+            ],
+            "zero_point": [
+              -128
+            ],
+            "quantized_dimension": 0,
+            "min": [
+              0.0
+            ],
+            "max": [
+              0.3387872278690338
+            ]
+          }
+        },
+        "node_Conv_16_conv_filter": {
+          "dtype": "INT8",
+          "kind": "weight",
+          "qparams": {
+            "scale": [
+              0.001289913896471262,
+              0.001437170198187232,
+              0.0014713366981595755,
+              0.0013824404450133443,
+              0.0014958615647628903,
+              0.001456892117857933,
+              0.0015138030285015702,
+              0.0014054997591301799,
+              0.0014768546679988503,
+              0.0014534613583236933,
+              0.0013903145445510745,
+              0.0014671130338683724,
+              0.0015098294243216515,
+              0.0015062683960422873,
+              0.0015094282571226358,
+              0.0014696891885250807
+            ],
+            "zero_point": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "quantized_dimension": 0,
+            "min": null,
+            "max": null
+          }
+        },
+        "node_Conv_16_conv_bias": {
+          "dtype": "INT32",
+          "kind": "bias",
+          "qparams": {
+            "scale": [
+              4.264106675082722e-05,
+              4.750896204843441e-05,
+              4.863841418469589e-05,
+              4.569974434426958e-05,
+              4.944913998333092e-05,
+              4.8160915403951696e-05,
+              5.004223627834834e-05,
+              4.6462022939123206e-05,
+              4.8820823352384715e-05,
+              4.8047503767170546e-05,
+              4.596004079111734e-05,
+              4.8498791259889074e-05,
+              4.991087966490243e-05,
+              4.9793161695526844e-05,
+              4.989761816166701e-05,
+              4.858395196943539e-05
+            ],
+            "zero_point": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "quantized_dimension": 0,
+            "min": null,
+            "max": null
+          }
+        },
+        "mean": {
+          "dtype": "INT8",
+          "kind": "activation",
+          "qparams": {
+            "scale": [
+              0.0013285773641922894
+            ],
+            "zero_point": [
+              -128
+            ],
+            "quantized_dimension": 0,
+            "min": [
+              0.0
+            ],
+            "max": [
+              0.3387872278690338
+            ]
+          }
+        },
+        "view": {
+          "dtype": "INT8",
+          "kind": "activation",
+          "qparams": {
+            "scale": [
+              0.0013285773641922894
+            ],
+            "zero_point": [
+              -128
+            ],
+            "quantized_dimension": 0,
+            "min": [
+              0.0
+            ],
+            "max": [
+              0.3387872278690338
+            ]
+          }
+        },
+        "output": {
+          "dtype": "INT8",
+          "kind": "activation",
+          "qparams": {
+            "scale": [
+              0.0015559860596469804
+            ],
+            "zero_point": [
+              -60
+            ],
+            "quantized_dimension": 0,
+            "min": [
+              -0.10581047087907791
+            ],
+            "max": [
+              0.2909659743309021
+            ]
+          }
+        },
+        "node_linear_fc_weights": {
+          "dtype": "INT8",
+          "kind": "weight",
+          "qparams": {
+            "scale": [
+              0.0017447187565267086,
+              0.0018905802862718701,
+              0.0018597455928102136,
+              0.0017971611814573407,
+              0.001961576286703348,
+              0.001815096358768642
+            ],
+            "zero_point": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "quantized_dimension": 0,
+            "min": null,
+            "max": null
+          }
+        },
+        "node_linear_fc_bias": {
+          "dtype": "INT32",
+          "kind": "bias",
+          "qparams": {
+            "scale": [
+              2.3179938468031033e-06,
+              2.511782173528985e-06,
+              2.4708158977640204e-06,
+              2.3876676654892945e-06,
+              2.6061058526504328e-06,
+              2.4114959360878646e-06
+            ],
+            "zero_point": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "quantized_dimension": 0,
+            "min": null,
+            "max": null
+          }
+        }
+      },
+      "quantized_ops": [
+        {
+          "index": 0,
+          "op_type": "PAD",
+          "inputs": [
+            "input",
+            "node_Conv_16_pads_nhwc"
+          ],
+          "outputs": [
+            "node_Conv_16_input_nhwc_padded"
+          ]
+        },
+        {
+          "index": 1,
+          "op_type": "CONV_2D",
+          "inputs": [
+            "node_Conv_16_input_nhwc_padded",
+            "node_Conv_16_conv_filter",
+            "node_Conv_16_conv_bias"
+          ],
+          "outputs": [
+            "relu"
+          ]
+        },
+        {
+          "index": 2,
+          "op_type": "MEAN",
+          "inputs": [
+            "relu",
+            "mean_mean_axes"
+          ],
+          "outputs": [
+            "mean"
+          ]
+        },
+        {
+          "index": 3,
+          "op_type": "RESHAPE",
+          "inputs": [
+            "mean",
+            "view_reshape_shape"
+          ],
+          "outputs": [
+            "view"
+          ]
+        },
+        {
+          "index": 4,
+          "op_type": "FULLY_CONNECTED",
+          "inputs": [
+            "view",
+            "node_linear_fc_weights",
+            "node_linear_fc_bias"
+          ],
+          "outputs": [
+            "output"
+          ]
+        }
+      ],
+      "failures": []
+    }
+  }
+}

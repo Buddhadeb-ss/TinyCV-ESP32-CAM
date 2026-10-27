@@ -505,84 +505,174 @@ HTML_TEMPLATE = """
 
 class RealTimeObjectTracker:
     """
-    Real-time visual object tracker that dynamically detects object contours and follows
-    the physical object across the 96x96 video feed with exponential smoothing.
+    Predictive Multi-Cue Color-Spatial & Contour Object Tracker:
+    - Segments physical target objects in 240x240 resolution using HSV perceptual color bands
+      matched to target objects (cream container, earbuds case, glue stick, mouse, dev board).
+    - Fuses color segmentation with adaptive foreground saliency and contour analysis.
+    - Uses momentum and exponential smoothing (alpha = 0.35) for fluid real-time tracking across the camera FOV.
+    - Handles motion persistence and smooth fade-out.
     """
     def __init__(self):
-        self.bg_subtractor = cv2.createBackgroundSubtractorMOG2(history=80, varThreshold=25, detectShadows=False)
-        self.smooth_box = None  # [x, y, w, h] in 96x96 coordinates
+        self.bg_subtractor = cv2.createBackgroundSubtractorMOG2(history=60, varThreshold=30, detectShadows=False)
+        self.smooth_box = None  # [x, y, w, h] in frame coordinates
         self.active_class = "background"
         self.frames_since_detect = 999
         self.alpha = 0.35  # Smoothing responsiveness factor
+        self.velocity = [0.0, 0.0, 0.0, 0.0]
+
+    def _extract_color_mask(self, frame_bgr, target_class):
+        """Extracts high-confidence color segmentation masks tailored to target objects."""
+        hsv = cv2.cvtColor(frame_bgr, cv2.COLOR_BGR2HSV)
+        mask = None
+
+        if target_class == "earbuds_case":
+            # Mint Cyan / Turquoise: H in [70, 115], S > 40, V > 50
+            lower = np.array([70, 40, 50], dtype=np.uint8)
+            upper = np.array([115, 255, 255], dtype=np.uint8)
+            mask = cv2.inRange(hsv, lower, upper)
+
+        elif target_class == "cream_container":
+            # Vivid Orange rim: H in [6, 26], S > 75, V > 70
+            lower_orange = np.array([6, 75, 70], dtype=np.uint8)
+            upper_orange = np.array([26, 255, 255], dtype=np.uint8)
+            m_orange = cv2.inRange(hsv, lower_orange, upper_orange)
+            # White lid center: S < 60, V > 165
+            lower_white = np.array([0, 0, 165], dtype=np.uint8)
+            upper_white = np.array([180, 60, 255], dtype=np.uint8)
+            m_white = cv2.inRange(hsv, lower_white, upper_white)
+            mask = cv2.bitwise_or(m_orange, m_white)
+
+        elif target_class == "glue_stick":
+            # Yellow cap: H in [18, 38], S > 90, V > 90
+            lower_y = np.array([18, 90, 90], dtype=np.uint8)
+            upper_y = np.array([38, 255, 255], dtype=np.uint8)
+            m_y = cv2.inRange(hsv, lower_y, upper_y)
+            # Blue tube: H in [98, 132], S > 70, V > 60
+            lower_b = np.array([98, 70, 60], dtype=np.uint8)
+            upper_b = np.array([132, 255, 255], dtype=np.uint8)
+            m_b = cv2.inRange(hsv, lower_b, upper_b)
+            mask = cv2.bitwise_or(m_y, m_b)
+
+        elif target_class == "mouse":
+            # Low brightness silhouette: V < 85, or high gradient boundary
+            lower_m = np.array([0, 0, 0], dtype=np.uint8)
+            upper_m = np.array([180, 120, 85], dtype=np.uint8)
+            mask = cv2.inRange(hsv, lower_m, upper_m)
+
+        elif target_class == "microcontroller_board":
+            # Metallic shield + circuit texture (high gradient with moderate saturation)
+            lower_p = np.array([0, 0, 90], dtype=np.uint8)
+            upper_p = np.array([180, 120, 240], dtype=np.uint8)
+            mask = cv2.inRange(hsv, lower_p, upper_p)
+
+        if mask is not None:
+            kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (5, 5))
+            mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel)
+            mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel)
+        return mask
 
     def update(self, frame_bgr, predicted_class, confidence, is_detected):
         h, w = frame_bgr.shape[:2]
         gray = cv2.cvtColor(frame_bgr, cv2.COLOR_BGR2GRAY)
         blurred = cv2.GaussianBlur(gray, (5, 5), 0)
 
-        # 1. Motion / foreground segmentation
+        # 1. Motion foreground mask
         fg_mask = self.bg_subtractor.apply(blurred)
         kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (3, 3))
         fg_mask = cv2.morphologyEx(fg_mask, cv2.MORPH_OPEN, kernel)
-        fg_mask = cv2.morphologyEx(fg_mask, cv2.MORPH_DILATE, kernel, iterations=2)
 
-        # 2. Gradient saliency (captures stationary contrasting objects)
+        # 2. Gradient / contrast saliency
         grad_x = cv2.Sobel(blurred, cv2.CV_32F, 1, 0, ksize=3)
         grad_y = cv2.Sobel(blurred, cv2.CV_32F, 0, 1, ksize=3)
         grad_mag = cv2.magnitude(grad_x, grad_y)
-        _, sal_mask = cv2.threshold(grad_mag, 22, 255, cv2.THRESH_BINARY)
+        _, sal_mask = cv2.threshold(grad_mag, 25, 255, cv2.THRESH_BINARY)
         sal_mask = sal_mask.astype(np.uint8)
 
-        # Combine cues and exclude boundary edge noise
-        combined = cv2.bitwise_or(fg_mask, sal_mask)
-        combined[:4, :] = 0
-        combined[-4:, :] = 0
-        combined[:, :4] = 0
-        combined[:, -4:] = 0
+        # 3. Class-specific predictive color mask
+        color_mask = self._extract_color_mask(frame_bgr, predicted_class)
 
-        contours, _ = cv2.findContours(combined, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-        detected_box = None
-        max_area = 0
-        for cnt in contours:
-            area = cv2.contourArea(cnt)
-            if area > 80:  # Minimum valid object footprint
-                if area > max_area:
-                    max_area = area
+        # Saliency combination
+        combined_saliency = cv2.bitwise_or(fg_mask, sal_mask)
+        # Suppress border artifacts
+        border_pad = 6
+        combined_saliency[:border_pad, :] = 0
+        combined_saliency[-border_pad:, :] = 0
+        combined_saliency[:, :border_pad] = 0
+        combined_saliency[:, -border_pad:] = 0
+
+        best_box = None
+        best_area = 0
+
+        # Prioritize predictive color mask if target class has distinct signature
+        if color_mask is not None:
+            color_mask[:border_pad, :] = 0
+            color_mask[-border_pad:, :] = 0
+            color_mask[:, :border_pad] = 0
+            color_mask[:, -border_pad:] = 0
+            contours, _ = cv2.findContours(color_mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+            for cnt in contours:
+                area = cv2.contourArea(cnt)
+                # Minimum footprint in 240x240 image is ~250 pixels
+                if area > 250 and area > best_area:
+                    best_area = area
                     x, y, bw, bh = cv2.boundingRect(cnt)
-                    # Add small padding
-                    pad = 3
+                    # Add generous contextual padding around color signature
+                    pad = 12
                     x = max(0, x - pad)
                     y = max(0, y - pad)
                     bw = min(w - x, bw + pad * 2)
                     bh = min(h - y, bh + pad * 2)
-                    detected_box = [x, y, bw, bh]
+                    best_box = [x, y, bw, bh]
 
-        # Check if neural inference confirms target presence
+        # If color mask didn't isolate an object, use general motion/saliency contours
+        if best_box is None:
+            contours, _ = cv2.findContours(combined_saliency, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+            for cnt in contours:
+                area = cv2.contourArea(cnt)
+                if area > 400 and area > best_area:
+                    best_area = area
+                    x, y, bw, bh = cv2.boundingRect(cnt)
+                    pad = 8
+                    x = max(0, x - pad)
+                    y = max(0, y - pad)
+                    bw = min(w - x, bw + pad * 2)
+                    bh = min(h - y, bh + pad * 2)
+                    best_box = [x, y, bw, bh]
+
+        # Process neural inference evaluation
         if is_detected and predicted_class != "background":
             self.frames_since_detect = 0
             self.active_class = predicted_class
 
-            if detected_box is not None:
-                target_box = detected_box
+            if best_box is not None:
+                target_box = best_box
             elif self.smooth_box is not None:
                 target_box = self.smooth_box
             else:
-                target_box = [16, 16, 64, 64] # Sensible central fallback
+                # Default centered region in 240x240: 160x160 box centered
+                target_box = [40, 40, 160, 160]
 
-            # Exponential smoothing for silky tracker motion
+            # Predictive smoothing filter with momentum
             if self.smooth_box is None:
                 self.smooth_box = [float(v) for v in target_box]
+                self.velocity = [0.0, 0.0, 0.0, 0.0]
             else:
                 for i in range(4):
-                    self.smooth_box[i] = self.alpha * target_box[i] + (1.0 - self.alpha) * self.smooth_box[i]
+                    diff = target_box[i] - self.smooth_box[i]
+                    self.velocity[i] = 0.3 * diff + 0.7 * self.velocity[i]
+                    self.smooth_box[i] = self.alpha * target_box[i] + (1.0 - self.alpha) * (self.smooth_box[i] + self.velocity[i] * 0.5)
 
             box_int = [int(round(v)) for v in self.smooth_box]
             return box_int, self.active_class, confidence, True
 
         else:
             self.frames_since_detect += 1
-            # Brief persistence (~0.35s) so box doesn't vanish on a single missed frame
-            if self.frames_since_detect < 5 and self.smooth_box is not None:
+            # 6-frame persistence (~0.4s) to glide over occasional frame drops
+            if self.frames_since_detect < 6 and self.smooth_box is not None:
+                # Coast using residual velocity
+                for i in range(4):
+                    self.smooth_box[i] += self.velocity[i] * 0.3
+                    self.velocity[i] *= 0.8
                 box_int = [int(round(v)) for v in self.smooth_box]
                 return box_int, self.active_class, confidence, True
             else:
@@ -593,12 +683,12 @@ class RealTimeObjectTracker:
 tracker = RealTimeObjectTracker()
 
 
-def draw_sleek_bounding_box(img, box, class_name, conf, scale=5):
+def draw_sleek_bounding_box(img, box, class_name, conf, scale=2):
     """Draws a responsive, high-visibility tracking box with corner brackets and badges."""
-    bx = box[0] * scale
-    by = box[1] * scale
-    bw = box[2] * scale
-    bh = box[3] * scale
+    bx = int(box[0] * scale)
+    by = int(box[1] * scale)
+    bw = int(box[2] * scale)
+    bh = int(box[3] * scale)
 
     color = CLASS_COLORS.get(class_name, (0, 230, 255))
 
@@ -606,7 +696,7 @@ def draw_sleek_bounding_box(img, box, class_name, conf, scale=5):
     cv2.rectangle(img, (bx, by), (bx + bw, by + bh), color, 2)
 
     # Corner brackets for tech aesthetic
-    bracket_len = min(20, min(bw, bh) // 4)
+    bracket_len = min(28, min(bw, bh) // 4)
     thick = 4
     # Top-Left
     cv2.line(img, (bx, by), (bx + bracket_len, by), color, thick)
@@ -634,29 +724,30 @@ def generate_annotated_mjpeg():
     while True:
         frame, tel, act_det, f_time, f_count, s_fps, dropped, errors = receiver.get_state()
         if frame is not None:
-            # Upscale 96x96 -> 480x480 for ultra-sharp browser view
-            scale = 5
+            # Scale dynamically to target 480x480 container
             h, w = frame.shape[:2]
-            display = cv2.resize(frame, (w * scale, h * scale), interpolation=cv2.INTER_NEAREST)
+            target_dim = 480
+            scale = target_dim / float(w)
+            display = cv2.resize(frame, (target_dim, target_dim), interpolation=cv2.INTER_LINEAR)
 
             cls_name = tel.get("cls", "background")
             conf = tel.get("conf", 0)
             is_detected = tel.get("det", 0) == 1
 
-            # Update real-time object tracker
+            # Update real-time predictive color-spatial tracker
             tracked_box, active_cls, active_conf, has_box = tracker.update(frame, cls_name, conf, is_detected)
 
             if has_box and tracked_box is not None:
                 draw_sleek_bounding_box(display, tracked_box, active_cls, active_conf, scale=scale)
             else:
                 # Faint Full-FOV scan reticle
-                cv2.rectangle(display, (10, 10), (w * scale - 10, h * scale - 10), (45, 55, 75), 1)
+                cv2.rectangle(display, (12, 12), (target_dim - 12, target_dim - 12), (40, 50, 70), 1)
 
             ret, jpeg = cv2.imencode('.jpg', display, [cv2.IMWRITE_JPEG_QUALITY, 85])
             if ret:
                 yield (b'--frame\r\n'
                        b'Content-Type: image/jpeg\r\n\r\n' + jpeg.tobytes() + b'\r\n')
-        time.sleep(0.04)
+        time.sleep(0.03)
 
 
 

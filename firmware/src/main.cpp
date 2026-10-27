@@ -35,6 +35,14 @@
 
 #define SERIAL_BAUD_RATE  460800
 
+#define FRAME_W           240
+#define FRAME_H           240
+
+// Motion & Saliency Grid (60x60 subsampled grid: step = 4, 3600 points)
+#define MOTION_GRID_W     60
+#define MOTION_GRID_H     60
+#define MOTION_STEP       4
+
 // Operating Modes
 enum OperationMode {
   MODE_HYBRID = 0,       // Classical CV Saliency / Motion triggers Localized Neural Recognition
@@ -62,8 +70,8 @@ namespace {
   static tflite::MicroMutableOpResolver<14> micro_op_resolver;
 }
 
-// Classical CV State
-static uint8_t prev_frame[96 * 96];
+// Classical CV State (Subsampled 60x60 motion grid)
+static uint8_t prev_frame[MOTION_GRID_W * MOTION_GRID_H];
 static bool has_prev_frame = false;
 
 // Statistics & Metrics
@@ -98,7 +106,7 @@ bool init_camera() {
   config.pin_reset = RESET_GPIO_NUM;
   config.xclk_freq_hz = 20000000;
   config.pixel_format = PIXFORMAT_RGB565; // RGB 16-bit color capture
-  config.frame_size = FRAMESIZE_96X96;    // 96x96 sensor resolution
+  config.frame_size = FRAMESIZE_240X240;  // 240x240 high-resolution sensor mode
   config.jpeg_quality = 12;
   config.fb_count = 2; // Double buffering
   config.fb_location = CAMERA_FB_IN_PSRAM;
@@ -176,10 +184,10 @@ bool init_tflm() {
   return true;
 }
 
-// Classical CV Color Saliency & Motion Analysis
+// Classical CV Color Saliency & Motion Analysis (Fast 60x60 Subsampled Grid)
 struct SaliencyResult {
   bool has_candidate;
-  int crop_x;             // Crop origin in 96x96 frame
+  int crop_x;             // Crop origin in 240x240 frame
   int crop_y;
   int crop_w;
   int crop_h;
@@ -190,7 +198,7 @@ struct SaliencyResult {
 };
 
 SaliencyResult analyze_saliency_and_motion(const uint8_t* rgb565_buf) {
-  SaliencyResult res = {false, 0, 0, 48, 48, "none", 0.0f, 48, 48};
+  SaliencyResult res = {false, 0, 0, FRAME_W, FRAME_H, "none", 0.0f, FRAME_W / 2, FRAME_H / 2};
   
   uint32_t total_diff = 0;
   uint32_t weighted_x = 0;
@@ -203,9 +211,11 @@ SaliencyResult analyze_saliency_and_motion(const uint8_t* rgb565_buf) {
   uint32_t orange_count = 0;
   uint32_t orange_x = 0, orange_y = 0;
 
-  for (int y = 0; y < 96; y++) {
-    int row_offset = y * 96 * 2;
-    for (int x = 0; x < 96; x++) {
+  for (int gy = 0; gy < MOTION_GRID_H; gy++) {
+    int y = gy * MOTION_STEP;
+    int row_offset = y * FRAME_W * 2;
+    for (int gx = 0; gx < MOTION_GRID_W; gx++) {
+      int x = gx * MOTION_STEP;
       int idx = row_offset + x * 2;
       uint16_t pix = ((uint16_t)rgb565_buf[idx] << 8) | rgb565_buf[idx + 1];
       
@@ -217,8 +227,8 @@ SaliencyResult analyze_saliency_and_motion(const uint8_t* rgb565_buf) {
       // Fast Luminance
       uint8_t lum = (uint8_t)((r * 77 + g * 150 + b * 29) >> 8);
       
-      // Motion differencing
-      int p_idx = y * 96 + x;
+      // Motion differencing on 60x60 grid
+      int p_idx = gy * MOTION_GRID_W + gx;
       if (has_prev_frame) {
         int diff = abs((int)lum - (int)prev_frame[p_idx]);
         if (diff > 18) {
@@ -231,13 +241,13 @@ SaliencyResult analyze_saliency_and_motion(const uint8_t* rgb565_buf) {
       prev_frame[p_idx] = lum;
       
       // Color Saliency Heuristics:
-      // 1. Cyan/Mint: G > 100, B > 100, R < 90, |G - B| < 40
+      // 1. Cyan/Mint: G > 90, B > 90, R < 90
       if (g > 90 && b > 90 && r < 90) {
         cyan_count++;
         cyan_x += x;
         cyan_y += y;
       }
-      // 2. Orange/Cream ring: R > 130, G > 70, G < 140, B < 60
+      // 2. Orange/Cream ring: R > 130, G > 65, G < 140, B < 60
       if (r > 130 && g > 65 && g < 140 && b < 60) {
         orange_count++;
         orange_x += x;
@@ -248,31 +258,37 @@ SaliencyResult analyze_saliency_and_motion(const uint8_t* rgb565_buf) {
   has_prev_frame = true;
 
   if (diff_pixel_count > 0 && total_diff > 0) {
-    res.motion_score = ((float)diff_pixel_count / (96.0f * 96.0f)) * 100.0f;
+    res.motion_score = ((float)diff_pixel_count / (float)(MOTION_GRID_W * MOTION_GRID_H)) * 100.0f;
     res.centroid_x = (int)(weighted_x / total_diff);
     res.centroid_y = (int)(weighted_y / total_diff);
   }
 
-  // Saliency decision
+  // Saliency decision (crops a 120x120 window around candidate)
   if (cyan_count >= 15) {
     res.has_candidate = true;
     res.proposal_type = "cyan_earbuds";
     int cx = cyan_x / cyan_count;
     int cy = cyan_y / cyan_count;
-    res.crop_x = constrain(cx - 24, 0, 48);
-    res.crop_y = constrain(cy - 24, 0, 48);
+    res.crop_w = 120;
+    res.crop_h = 120;
+    res.crop_x = constrain(cx - 60, 0, FRAME_W - 120);
+    res.crop_y = constrain(cy - 60, 0, FRAME_H - 120);
   } else if (orange_count >= 12) {
     res.has_candidate = true;
     res.proposal_type = "orange_cream";
     int cx = orange_x / orange_count;
     int cy = orange_y / orange_count;
-    res.crop_x = constrain(cx - 24, 0, 48);
-    res.crop_y = constrain(cy - 24, 0, 48);
+    res.crop_w = 120;
+    res.crop_h = 120;
+    res.crop_x = constrain(cx - 60, 0, FRAME_W - 120);
+    res.crop_y = constrain(cy - 60, 0, FRAME_H - 120);
   } else if (res.motion_score > 3.0f) {
     res.has_candidate = true;
     res.proposal_type = "motion_cluster";
-    res.crop_x = constrain(res.centroid_x - 24, 0, 48);
-    res.crop_y = constrain(res.centroid_y - 24, 0, 48);
+    res.crop_w = 120;
+    res.crop_h = 120;
+    res.crop_x = constrain(res.centroid_x - 60, 0, FRAME_W - 120);
+    res.crop_y = constrain(res.centroid_y - 60, 0, FRAME_H - 120);
   }
   return res;
 }
@@ -287,12 +303,12 @@ void preprocess_crop_to_tensor(const uint8_t* rgb565_buf, int crop_x, int crop_y
 
   for (int y = 0; y < 48; y++) {
     int src_y = crop_y + (int)(y * scale_y);
-    src_y = constrain(src_y, 0, 95);
-    int row_offset = src_y * 96 * 2;
+    src_y = constrain(src_y, 0, FRAME_H - 1);
+    int row_offset = src_y * FRAME_W * 2;
     
     for (int x = 0; x < 48; x++) {
       int src_x = crop_x + (int)(x * scale_x);
-      src_x = constrain(src_x, 0, 95);
+      src_x = constrain(src_x, 0, FRAME_W - 1);
       
       int pix_idx = row_offset + src_x * 2;
       uint16_t pix = ((uint16_t)rgb565_buf[pix_idx] << 8) | rgb565_buf[pix_idx + 1];
@@ -477,7 +493,7 @@ void setup() {
       delay(200);
     }
   }
-  Serial.println("[CAMERA] OV3660/OV2640 Initialized (96x96 RGB565 Double-Buffered)");
+  Serial.println("[CAMERA] OV3660/OV2640 Initialized (240x240 RGB565 Double-Buffered)");
 
   // Initialize TFLM
   if (!init_tflm()) {
@@ -510,24 +526,24 @@ void loop() {
   // Step 1: Classical CV Saliency and Motion
   SaliencyResult saliency = analyze_saliency_and_motion(fb->buf);
 
-  // Step 2: Determine if and where Neural Network runs (Full-FOV 96x96 -> 48x48)
+  // Step 2: Determine if and where Neural Network runs (Full-FOV 240x240 -> 48x48)
   bool run_ai = false;
-  int crop_x = 0, crop_y = 0, crop_w = 96, crop_h = 96; // Full-FOV 100% camera coverage
+  int crop_x = 0, crop_y = 0, crop_w = FRAME_W, crop_h = FRAME_H; // Full-FOV 100% camera coverage
 
   if (current_mode == MODE_CONTINUOUS_AI) {
     run_ai = true;
-    crop_x = 0; crop_y = 0; crop_w = 96; crop_h = 96;
+    crop_x = 0; crop_y = 0; crop_w = FRAME_W; crop_h = FRAME_H;
   } else if (current_mode == MODE_HYBRID) {
     if (saliency.has_candidate) {
       run_ai = true;
       crop_x = saliency.crop_x;
       crop_y = saliency.crop_y;
-      crop_w = 48;
-      crop_h = 48;
+      crop_w = saliency.crop_w;
+      crop_h = saliency.crop_h;
     } else {
       // Full-FOV continuous background monitoring
       run_ai = true;
-      crop_x = 0; crop_y = 0; crop_w = 96; crop_h = 96;
+      crop_x = 0; crop_y = 0; crop_w = FRAME_W; crop_h = FRAME_H;
     }
   }
 

@@ -269,22 +269,23 @@ def render_dashboard_frame(receiver, flash_on, thresh_val, canvas_w=840, canvas_
     cv2.line(canvas, (0, 48), (canvas_w, 48), (55, 60, 72), 1)
     cv2.putText(canvas, "ESP32-CAM TinyML Custom Object Recognition", (20, 32),
                 cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 230, 255), 2, cv2.LINE_AA)
-    cv2.putText(canvas, "OV3660 96x96 | 240MHz Xtensa | TFLM INT8", (canvas_w - 320, 32),
+    cv2.putText(canvas, "OV3660 240x240 | 240MHz Xtensa | TFLM INT8", (canvas_w - 340, 32),
                 cv2.FONT_HERSHEY_SIMPLEX, 0.44, (160, 175, 190), 1, cv2.LINE_AA)
 
     frame, tel, act_det, f_time, f_count, s_fps, dropped, errors = receiver.get_state()
     now = time.time()
     time_since_frame = now - f_time if f_time > 0 else 999.0
 
-    # Video Viewport Setup: 96x96 -> 384x384 (scale = 4)
-    view_scale = 4
-    vp_size = 96 * view_scale
+    # Video Viewport Setup: 384x384
+    vp_size = 384
     vp_x, vp_y = 22, 68
 
     cv2.rectangle(canvas, (vp_x - 2, vp_y - 2), (vp_x + vp_size + 2, vp_y + vp_size + 2), (55, 60, 72), 1)
 
     if frame is not None and time_since_frame < 3.0:
-        scaled_frame = cv2.resize(frame, (vp_size, vp_size), interpolation=cv2.INTER_NEAREST)
+        fh, fw = frame.shape[:2]
+        view_scale = float(vp_size) / float(fw)
+        scaled_frame = cv2.resize(frame, (vp_size, vp_size), interpolation=cv2.INTER_LINEAR)
 
         # Draw verified neural detection overlay ONLY when active and fresh (< 0.5s)
         draw_detection = False

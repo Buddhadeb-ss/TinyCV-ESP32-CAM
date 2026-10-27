@@ -89,6 +89,23 @@ Building production-grade TinyML requires confronting hard physical realities. B
 
 ---
 
+### ❌ Failure 6: Label Contamination & The Keyboard False Positive in the Screen Recording
+- **What Failed in the Demo Recording**: In the screen recording at seconds 6–15, when the camera panned over the laptop keyboard, the dashboard erroneously triggered `Computer Mouse [97%]`. In another segment, the cream container flickered with `Glue Stick`.
+- **The Forensic Discovery**:
+  During a systematic, image-by-image audit of all 611 captures:
+  1. In `cream_container/`: 8 captures actually contained the optical mouse, and 8 captures were a grey blanket and blurry hands.
+  2. In `mouse/`: 10 captures actually showed the **laptop keyboard** and empty desk cables!
+  3. Because the neural network was trained on laptop keyboard images labeled as `mouse`, it dutifully memorized: *"Laptop keyboard = Computer Mouse"*, producing a 97% false positive whenever the laptop keyboard entered the frame!
+- **The Solution & 100% Verification**:
+  1. We executed a complete dataset audit across all 6 classes, purging 41 contaminated and blurry frames.
+  2. The keyboard and empty desk captures were explicitly reclassified as **`background` hard negatives** to teach the network to actively suppress keyboard features.
+  3. Retrained `DeskObjectNet` on **581 clean, verified sensor frames**:
+     - **Test Set Accuracy**: **100.00% (84/84)** on the held-out test split.
+     - **Background Rejection**: **100% (13/13)** (zero false alarms on keyboard or desk).
+     - **Class Precision**: 100% across all 6 categories (Mouse: 15/15, Earbuds: 14/14, Glue Stick: 15/15, Cream Container: 14/14, MCU: 13/13).
+  4. Updated the animated README demonstration preview to feature the verified working segment (**Earbuds Case 98% tracking**).
+
+
 ## 4. Why This is the Best Approach for the ESP32-CAM
 
 The ESP32-CAM presents extreme embedded hardware constraints. Understanding why our architecture is optimal requires analyzing the **Embedded Silicon Triangle**:

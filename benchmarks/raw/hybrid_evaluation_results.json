@@ -1,0 +1,49 @@
+{
+  "system": "Candidate 3: Hybrid Classical CV + INT8 TinyDeskClassifier",
+  "model_file": "candidate1_classifier_full_integer_quant.tflite",
+  "model_size_bytes": 11208,
+  "input_resolution": "Variable ROI -> 48x48x3 INT8",
+  "all_images_metrics": {
+    "precision": 0.0267,
+    "recall": 0.04,
+    "f1": 0.032,
+    "tp": 2,
+    "fp": 73,
+    "fn": 48
+  },
+  "held_out_test_metrics": {
+    "precision": 0.0,
+    "recall": 0.0,
+    "f1": 0.0,
+    "tp": 0,
+    "fp": 8,
+    "fn": 6
+  },
+  "per_class": {
+    "cream_container": {
+      "tp": 1,
+      "fp": 28,
+      "fn": 15
+    },
+    "mouse": {
+      "tp": 0,
+      "fp": 14,
+      "fn": 11
+    },
+    "earbuds_case": {
+      "tp": 1,
+      "fp": 17,
+      "fn": 10
+    },
+    "glue_stick": {
+      "tp": 0,
+      "fp": 7,
+      "fn": 7
+    },
+    "microcontroller_board": {
+      "tp": 0,
+      "fp": 7,
+      "fn": 5
+    }
+  }
+}

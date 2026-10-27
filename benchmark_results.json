@@ -1,0 +1,54 @@
+{
+  "timestamp": "2026-10-27 18:24:46",
+  "port": "COM8",
+  "baud": 460800,
+  "boot_log": [
+    "==============================================",
+    "ESP32-CAM Edge-AI Vision System v1.1",
+    "==============================================",
+    "Chip: ESP32-D0WD-V3 @ 240 MHz | Reset Reason: 1",
+    "Total Free Heap: 4434296 bytes | PSRAM: YES (4192124 bytes free)",
+    "[CAMERA] OV3660/OV2640 Initialized (96x96 Grayscale DMA)",
+    "[TFLM] Model loaded successfully! Input bytes: 9216, Arena used: 82300 bytes",
+    "[READY] System initialized and streaming telemetry."
+  ],
+  "modes_tested": {
+    "CONTINUOUS_AI": {
+      "samples": 30,
+      "mean_latency_ms": 517.2,
+      "median_latency_ms": 517.0,
+      "min_latency_ms": 517,
+      "max_latency_ms": 518,
+      "p95_latency_ms": 518.0,
+      "effective_fps": 1.93
+    },
+    "PURE_CV": {
+      "samples": 60,
+      "mean_fps": 15.2,
+      "peak_fps": 25.0,
+      "min_fps": 1.9
+    }
+  },
+  "memory_profile": {
+    "initial_heap_bytes": 4246748,
+    "final_heap_bytes": 4246748,
+    "final_psram_bytes": 4038488,
+    "heap_delta_bytes": 0,
+    "leak_detected": false
+  },
+  "frame_capture": {
+    "success": true,
+    "resolution": "96x96",
+    "bytes": 9216,
+    "mean_luminance": 167.0908203125,
+    "min_val": 49,
+    "max_val": 255,
+    "file": "c:/All_Projects/esp32_cam_ai_system/real_camera_capture.png"
+  },
+  "stability": {
+    "total_test_frames": 150,
+    "watchdog_resets": 0,
+    "crashes_observed": 0,
+    "hardware_connection_healthy": true
+  }
+}

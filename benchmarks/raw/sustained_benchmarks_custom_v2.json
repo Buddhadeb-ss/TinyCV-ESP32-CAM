@@ -1,0 +1,66 @@
+{
+  "device": "AI-Thinker ESP32-CAM",
+  "mcu": "ESP32-D0WD-V3 @ 240 MHz",
+  "camera_sensor": "OV3660 / OV2640 (RGB565 96x96)",
+  "model_architecture": "DeskObjectNet INT8 Quantized",
+  "model_binary_size_bytes": 14808,
+  "firmware_binary_size_bytes": 508977,
+  "modes": {
+    "Continuous_AI": {
+      "mode_name": "Continuous_AI",
+      "target_frames": 50,
+      "mean_nn_latency_ms": 140.72,
+      "median_nn_latency_ms": 141.0,
+      "p95_nn_latency_ms": 141.0,
+      "min_nn_latency_ms": 139,
+      "max_nn_latency_ms": 141,
+      "mean_fps": 6.19,
+      "max_fps": 6.4,
+      "free_heap_start": 4263040,
+      "free_heap_end": 4262772,
+      "heap_leak_bytes": 268,
+      "free_psram_bytes": 4054872,
+      "class_distribution": {
+        "background": 1,
+        "cream_container": 49
+      }
+    },
+    "Hybrid_Saliency_AI": {
+      "mode_name": "Hybrid_Saliency_AI",
+      "target_frames": 80,
+      "mean_nn_latency_ms": 140.6,
+      "median_nn_latency_ms": 141.0,
+      "p95_nn_latency_ms": 141.0,
+      "min_nn_latency_ms": 140,
+      "max_nn_latency_ms": 141,
+      "mean_fps": 17.59,
+      "max_fps": 22.0,
+      "free_heap_start": 4262772,
+      "free_heap_end": 4262772,
+      "heap_leak_bytes": 0,
+      "free_psram_bytes": 4054872,
+      "class_distribution": {
+        "cream_container": 5,
+        "background": 75
+      }
+    },
+    "Pure_Classical_CV": {
+      "mode_name": "Pure_Classical_CV",
+      "target_frames": 60,
+      "mean_nn_latency_ms": 0.0,
+      "median_nn_latency_ms": 0.0,
+      "p95_nn_latency_ms": 0.0,
+      "min_nn_latency_ms": 0,
+      "max_nn_latency_ms": 0,
+      "mean_fps": 23.9,
+      "max_fps": 25.0,
+      "free_heap_start": 4262772,
+      "free_heap_end": 4262772,
+      "heap_leak_bytes": 0,
+      "free_psram_bytes": 4054872,
+      "class_distribution": {
+        "background": 60
+      }
+    }
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "status": "PASS",
+  "timestamp": "2026-10-27 23:55:13",
+  "hardware": "AI-Thinker ESP32-CAM (Xtensa LX6 @ 240MHz)",
+  "sensor": "OV3660 (96x96 RGB565 sensor capture)",
+  "transport": "Framed Binary JPEG over Serial COM8 @ 460800 baud",
+  "frames_decoded": 113,
+  "dropped_packets": 0,
+  "serial_errors": 0,
+  "stream_fps": 11.9,
+  "mean_luminance": 164.3,
+  "inference_latency_ms": 141,
+  "free_heap_bytes": 4254740,
+  "free_psram_bytes": 4054872,
+  "black_screen_bug_resolved": true,
+  "toggling_phantom_boxes_resolved": true
+}

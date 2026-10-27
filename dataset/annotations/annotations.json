@@ -1,0 +1,494 @@
+{
+  "WhatsApp Image 2026-10-27 at 8.01.57 PM.jpeg": [
+    {
+      "class": "cream_container",
+      "bbox": [
+        1010,
+        500,
+        100,
+        95
+      ]
+    },
+    {
+      "class": "mouse",
+      "bbox": [
+        945,
+        680,
+        115,
+        175
+      ]
+    },
+    {
+      "class": "microcontroller_board",
+      "bbox": [
+        860,
+        615,
+        75,
+        90
+      ]
+    }
+  ],
+  "WhatsApp Image 2026-10-27 at 8.01.58 PM (1).jpeg": [
+    {
+      "class": "cream_container",
+      "bbox": [
+        745,
+        335,
+        70,
+        60
+      ]
+    },
+    {
+      "class": "mouse",
+      "bbox": [
+        755,
+        410,
+        100,
+        130
+      ]
+    },
+    {
+      "class": "glue_stick",
+      "bbox": [
+        550,
+        360,
+        25,
+        75
+      ]
+    }
+  ],
+  "WhatsApp Image 2026-10-27 at 8.01.58 PM (2).jpeg": [
+    {
+      "class": "cream_container",
+      "bbox": [
+        1055,
+        670,
+        85,
+        75
+      ]
+    },
+    {
+      "class": "glue_stick",
+      "bbox": [
+        1015,
+        420,
+        30,
+        80
+      ]
+    },
+    {
+      "class": "microcontroller_board",
+      "bbox": [
+        1030,
+        630,
+        45,
+        55
+      ]
+    }
+  ],
+  "WhatsApp Image 2026-10-27 at 8.01.58 PM.jpeg": [
+    {
+      "class": "cream_container",
+      "bbox": [
+        338,
+        875,
+        120,
+        100
+      ]
+    },
+    {
+      "class": "mouse",
+      "bbox": [
+        190,
+        715,
+        160,
+        205
+      ]
+    },
+    {
+      "class": "glue_stick",
+      "bbox": [
+        115,
+        390,
+        35,
+        90
+      ]
+    },
+    {
+      "class": "microcontroller_board",
+      "bbox": [
+        230,
+        615,
+        65,
+        75
+      ]
+    }
+  ],
+  "WhatsApp Image 2026-10-27 at 8.01.59 PM.jpeg": [
+    {
+      "class": "cream_container",
+      "bbox": [
+        745,
+        370,
+        50,
+        45
+      ]
+    }
+  ],
+  "WhatsApp Image 2026-10-27 at 8.02.00 PM.jpeg": [
+    {
+      "class": "cream_container",
+      "bbox": [
+        1040,
+        700,
+        75,
+        65
+      ]
+    },
+    {
+      "class": "mouse",
+      "bbox": [
+        890,
+        780,
+        125,
+        140
+      ]
+    },
+    {
+      "class": "microcontroller_board",
+      "bbox": [
+        1010,
+        640,
+        40,
+        55
+      ]
+    }
+  ],
+  "WhatsApp Image 2026-10-27 at 8.02.08 PM.jpeg": [
+    {
+      "class": "cream_container",
+      "bbox": [
+        178,
+        785,
+        95,
+        90
+      ]
+    },
+    {
+      "class": "earbuds_case",
+      "bbox": [
+        900,
+        630,
+        110,
+        115
+      ]
+    },
+    {
+      "class": "mouse",
+      "bbox": [
+        655,
+        770,
+        130,
+        110
+      ]
+    }
+  ],
+  "WhatsApp Image 2026-10-27 at 8.02.09 PM.jpeg": [
+    {
+      "class": "cream_container",
+      "bbox": [
+        430,
+        755,
+        65,
+        55
+      ]
+    },
+    {
+      "class": "earbuds_case",
+      "bbox": [
+        735,
+        695,
+        45,
+        50
+      ]
+    },
+    {
+      "class": "mouse",
+      "bbox": [
+        610,
+        755,
+        95,
+        65
+      ]
+    }
+  ],
+  "WhatsApp Image 2026-10-27 at 8.02.36 PM.jpeg": [
+    {
+      "class": "earbuds_case",
+      "bbox": [
+        1125,
+        730,
+        60,
+        50
+      ]
+    },
+    {
+      "class": "mouse",
+      "bbox": [
+        995,
+        730,
+        85,
+        55
+      ]
+    },
+    {
+      "class": "glue_stick",
+      "bbox": [
+        1190,
+        705,
+        30,
+        55
+      ]
+    }
+  ],
+  "WhatsApp Image 2026-10-27 at 8.02.37 PM (1).jpeg": [
+    {
+      "class": "earbuds_case",
+      "bbox": [
+        90,
+        635,
+        80,
+        105
+      ]
+    },
+    {
+      "class": "glue_stick",
+      "bbox": [
+        255,
+        615,
+        35,
+        70
+      ]
+    },
+    {
+      "class": "microcontroller_board",
+      "bbox": [
+        320,
+        660,
+        55,
+        50
+      ]
+    }
+  ],
+  "WhatsApp Image 2026-10-27 at 8.02.37 PM (2).jpeg": [
+    {
+      "class": "earbuds_case",
+      "bbox": [
+        765,
+        570,
+        45,
+        40
+      ]
+    },
+    {
+      "class": "mouse",
+      "bbox": [
+        815,
+        630,
+        40,
+        70
+      ]
+    }
+  ],
+  "WhatsApp Image 2026-10-27 at 8.02.37 PM.jpeg": [
+    {
+      "class": "earbuds_case",
+      "bbox": [
+        1035,
+        660,
+        55,
+        45
+      ]
+    },
+    {
+      "class": "glue_stick",
+      "bbox": [
+        1135,
+        655,
+        25,
+        55
+      ]
+    }
+  ],
+  "WhatsApp Image 2026-10-27 at 8.02.38 PM (1).jpeg": [
+    {
+      "class": "cream_container",
+      "bbox": [
+        355,
+        790,
+        60,
+        50
+      ]
+    }
+  ],
+  "WhatsApp Image 2026-10-27 at 8.02.38 PM (2).jpeg": [
+    {
+      "class": "glue_stick",
+      "bbox": [
+        675,
+        845,
+        40,
+        70
+      ]
+    }
+  ],
+  "WhatsApp Image 2026-10-27 at 8.02.38 PM.jpeg": [
+    {
+      "class": "cream_container",
+      "bbox": [
+        960,
+        790,
+        50,
+        40
+      ]
+    }
+  ],
+  "WhatsApp Image 2026-10-27 at 8.02.39 PM (1).jpeg": [
+    {
+      "class": "cream_container",
+      "bbox": [
+        10,
+        825,
+        60,
+        55
+      ]
+    },
+    {
+      "class": "earbuds_case",
+      "bbox": [
+        350,
+        785,
+        65,
+        50
+      ]
+    }
+  ],
+  "WhatsApp Image 2026-10-27 at 8.02.39 PM.jpeg": [
+    {
+      "class": "cream_container",
+      "bbox": [
+        470,
+        775,
+        45,
+        25
+      ]
+    }
+  ],
+  "WhatsApp Image 2026-10-27 at 8.02.40 PM (1).jpeg": [
+    {
+      "class": "cream_container",
+      "bbox": [
+        900,
+        770,
+        35,
+        30
+      ]
+    },
+    {
+      "class": "earbuds_case",
+      "bbox": [
+        1035,
+        830,
+        40,
+        35
+      ]
+    },
+    {
+      "class": "mouse",
+      "bbox": [
+        900,
+        795,
+        65,
+        50
+      ]
+    }
+  ],
+  "WhatsApp Image 2026-10-27 at 8.02.40 PM.jpeg": [
+    {
+      "class": "cream_container",
+      "bbox": [
+        90,
+        970,
+        45,
+        35
+      ]
+    },
+    {
+      "class": "earbuds_case",
+      "bbox": [
+        305,
+        945,
+        40,
+        40
+      ]
+    }
+  ],
+  "WhatsApp Image 2026-10-27 at 8.02.41 PM (1).jpeg": [
+    {
+      "class": "cream_container",
+      "bbox": [
+        455,
+        940,
+        50,
+        45
+      ]
+    },
+    {
+      "class": "earbuds_case",
+      "bbox": [
+        735,
+        935,
+        55,
+        50
+      ]
+    },
+    {
+      "class": "mouse",
+      "bbox": [
+        635,
+        970,
+        45,
+        35
+      ]
+    }
+  ],
+  "WhatsApp Image 2026-10-27 at 8.02.41 PM.jpeg": [
+    {
+      "class": "cream_container",
+      "bbox": [
+        940,
+        965,
+        45,
+        40
+      ]
+    },
+    {
+      "class": "earbuds_case",
+      "bbox": [
+        1160,
+        905,
+        45,
+        45
+      ]
+    },
+    {
+      "class": "mouse",
+      "bbox": [
+        1085,
+        945,
+        65,
+        50
+      ]
+    }
+  ]
+}

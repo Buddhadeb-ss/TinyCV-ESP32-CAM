@@ -16,3 +16,7 @@ ENV/
 # Temporary media recordings (test.mp4 is tracked)
 *.mkv
 *.avi
+
+# Quarantined corrupted/mislabeled raw captures
+dataset/quarantine_corrupted/
+

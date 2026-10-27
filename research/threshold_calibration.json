@@ -1,0 +1,151 @@
+{
+  "calibration_name": "Conservative Threshold Calibration for ESP32-CAM",
+  "checkpoint_used": "sensor_matched_model_best.pth",
+  "validation_samples_evaluated": 180,
+  "recommended_global_threshold_pct": 20,
+  "per_class_recommended_thresholds_pct": {
+    "cream_container": 20,
+    "mouse": 20,
+    "earbuds_case": 20,
+    "glue_stick": 20,
+    "microcontroller_board": 20
+  },
+  "operating_rule": "IF conf < threshold OR class == background THEN DO NOT DRAW BOUNDING BOX",
+  "threshold_sweep_curve": [
+    {
+      "threshold": 0.2,
+      "threshold_pct": 20,
+      "precision": 0.907,
+      "recall": 0.958,
+      "f1_score": 0.932,
+      "false_positives": 14,
+      "missed_detections": 6
+    },
+    {
+      "threshold": 0.25,
+      "threshold_pct": 25,
+      "precision": 0.907,
+      "recall": 0.958,
+      "f1_score": 0.932,
+      "false_positives": 14,
+      "missed_detections": 6
+    },
+    {
+      "threshold": 0.3,
+      "threshold_pct": 30,
+      "precision": 0.913,
+      "recall": 0.951,
+      "f1_score": 0.932,
+      "false_positives": 13,
+      "missed_detections": 7
+    },
+    {
+      "threshold": 0.35,
+      "threshold_pct": 35,
+      "precision": 0.913,
+      "recall": 0.951,
+      "f1_score": 0.932,
+      "false_positives": 13,
+      "missed_detections": 7
+    },
+    {
+      "threshold": 0.4,
+      "threshold_pct": 40,
+      "precision": 0.919,
+      "recall": 0.945,
+      "f1_score": 0.932,
+      "false_positives": 12,
+      "missed_detections": 8
+    },
+    {
+      "threshold": 0.45,
+      "threshold_pct": 44,
+      "precision": 0.919,
+      "recall": 0.945,
+      "f1_score": 0.932,
+      "false_positives": 12,
+      "missed_detections": 8
+    },
+    {
+      "threshold": 0.5,
+      "threshold_pct": 50,
+      "precision": 0.925,
+      "recall": 0.932,
+      "f1_score": 0.928,
+      "false_positives": 11,
+      "missed_detections": 10
+    },
+    {
+      "threshold": 0.55,
+      "threshold_pct": 55,
+      "precision": 0.957,
+      "recall": 0.894,
+      "f1_score": 0.925,
+      "false_positives": 6,
+      "missed_detections": 16
+    },
+    {
+      "threshold": 0.6,
+      "threshold_pct": 60,
+      "precision": 0.956,
+      "recall": 0.868,
+      "f1_score": 0.91,
+      "false_positives": 6,
+      "missed_detections": 20
+    },
+    {
+      "threshold": 0.65,
+      "threshold_pct": 64,
+      "precision": 0.963,
+      "recall": 0.861,
+      "f1_score": 0.909,
+      "false_positives": 5,
+      "missed_detections": 21
+    },
+    {
+      "threshold": 0.7,
+      "threshold_pct": 70,
+      "precision": 0.963,
+      "recall": 0.854,
+      "f1_score": 0.905,
+      "false_positives": 5,
+      "missed_detections": 22
+    },
+    {
+      "threshold": 0.75,
+      "threshold_pct": 75,
+      "precision": 0.968,
+      "recall": 0.803,
+      "f1_score": 0.878,
+      "false_positives": 4,
+      "missed_detections": 30
+    },
+    {
+      "threshold": 0.8,
+      "threshold_pct": 80,
+      "precision": 0.966,
+      "recall": 0.743,
+      "f1_score": 0.84,
+      "false_positives": 4,
+      "missed_detections": 39
+    },
+    {
+      "threshold": 0.85,
+      "threshold_pct": 84,
+      "precision": 0.982,
+      "recall": 0.708,
+      "f1_score": 0.823,
+      "false_positives": 2,
+      "missed_detections": 45
+    },
+    {
+      "threshold": 0.9,
+      "threshold_pct": 90,
+      "precision": 0.989,
+      "recall": 0.606,
+      "f1_score": 0.752,
+      "false_positives": 1,
+      "missed_detections": 61
+    }
+  ]
+}

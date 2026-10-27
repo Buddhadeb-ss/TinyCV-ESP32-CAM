@@ -503,6 +503,132 @@ HTML_TEMPLATE = """
 """
 
 
+class RealTimeObjectTracker:
+    """
+    Real-time visual object tracker that dynamically detects object contours and follows
+    the physical object across the 96x96 video feed with exponential smoothing.
+    """
+    def __init__(self):
+        self.bg_subtractor = cv2.createBackgroundSubtractorMOG2(history=80, varThreshold=25, detectShadows=False)
+        self.smooth_box = None  # [x, y, w, h] in 96x96 coordinates
+        self.active_class = "background"
+        self.frames_since_detect = 999
+        self.alpha = 0.35  # Smoothing responsiveness factor
+
+    def update(self, frame_bgr, predicted_class, confidence, is_detected):
+        h, w = frame_bgr.shape[:2]
+        gray = cv2.cvtColor(frame_bgr, cv2.COLOR_BGR2GRAY)
+        blurred = cv2.GaussianBlur(gray, (5, 5), 0)
+
+        # 1. Motion / foreground segmentation
+        fg_mask = self.bg_subtractor.apply(blurred)
+        kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (3, 3))
+        fg_mask = cv2.morphologyEx(fg_mask, cv2.MORPH_OPEN, kernel)
+        fg_mask = cv2.morphologyEx(fg_mask, cv2.MORPH_DILATE, kernel, iterations=2)
+
+        # 2. Gradient saliency (captures stationary contrasting objects)
+        grad_x = cv2.Sobel(blurred, cv2.CV_32F, 1, 0, ksize=3)
+        grad_y = cv2.Sobel(blurred, cv2.CV_32F, 0, 1, ksize=3)
+        grad_mag = cv2.magnitude(grad_x, grad_y)
+        _, sal_mask = cv2.threshold(grad_mag, 22, 255, cv2.THRESH_BINARY)
+        sal_mask = sal_mask.astype(np.uint8)
+
+        # Combine cues and exclude boundary edge noise
+        combined = cv2.bitwise_or(fg_mask, sal_mask)
+        combined[:4, :] = 0
+        combined[-4:, :] = 0
+        combined[:, :4] = 0
+        combined[:, -4:] = 0
+
+        contours, _ = cv2.findContours(combined, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        detected_box = None
+        max_area = 0
+        for cnt in contours:
+            area = cv2.contourArea(cnt)
+            if area > 80:  # Minimum valid object footprint
+                if area > max_area:
+                    max_area = area
+                    x, y, bw, bh = cv2.boundingRect(cnt)
+                    # Add small padding
+                    pad = 3
+                    x = max(0, x - pad)
+                    y = max(0, y - pad)
+                    bw = min(w - x, bw + pad * 2)
+                    bh = min(h - y, bh + pad * 2)
+                    detected_box = [x, y, bw, bh]
+
+        # Check if neural inference confirms target presence
+        if is_detected and predicted_class != "background":
+            self.frames_since_detect = 0
+            self.active_class = predicted_class
+
+            if detected_box is not None:
+                target_box = detected_box
+            elif self.smooth_box is not None:
+                target_box = self.smooth_box
+            else:
+                target_box = [16, 16, 64, 64] # Sensible central fallback
+
+            # Exponential smoothing for silky tracker motion
+            if self.smooth_box is None:
+                self.smooth_box = [float(v) for v in target_box]
+            else:
+                for i in range(4):
+                    self.smooth_box[i] = self.alpha * target_box[i] + (1.0 - self.alpha) * self.smooth_box[i]
+
+            box_int = [int(round(v)) for v in self.smooth_box]
+            return box_int, self.active_class, confidence, True
+
+        else:
+            self.frames_since_detect += 1
+            # Brief persistence (~0.35s) so box doesn't vanish on a single missed frame
+            if self.frames_since_detect < 5 and self.smooth_box is not None:
+                box_int = [int(round(v)) for v in self.smooth_box]
+                return box_int, self.active_class, confidence, True
+            else:
+                self.smooth_box = None
+                return None, "background", 0, False
+
+
+tracker = RealTimeObjectTracker()
+
+
+def draw_sleek_bounding_box(img, box, class_name, conf, scale=5):
+    """Draws a responsive, high-visibility tracking box with corner brackets and badges."""
+    bx = box[0] * scale
+    by = box[1] * scale
+    bw = box[2] * scale
+    bh = box[3] * scale
+
+    color = CLASS_COLORS.get(class_name, (0, 230, 255))
+
+    # Outer border
+    cv2.rectangle(img, (bx, by), (bx + bw, by + bh), color, 2)
+
+    # Corner brackets for tech aesthetic
+    bracket_len = min(20, min(bw, bh) // 4)
+    thick = 4
+    # Top-Left
+    cv2.line(img, (bx, by), (bx + bracket_len, by), color, thick)
+    cv2.line(img, (bx, by), (bx, by + bracket_len), color, thick)
+    # Top-Right
+    cv2.line(img, (bx + bw, by), (bx + bw - bracket_len, by), color, thick)
+    cv2.line(img, (bx + bw, by), (bx + bw, by + bracket_len), color, thick)
+    # Bottom-Left
+    cv2.line(img, (bx, by + bh), (bx + bracket_len, by + bh), color, thick)
+    cv2.line(img, (bx, by + bh), (bx, by + bh - bracket_len), color, thick)
+    # Bottom-Right
+    cv2.line(img, (bx + bw, by + bh), (bx + bw - bracket_len, by + bh), color, thick)
+    cv2.line(img, (bx + bw, by + bh), (bx + bw, by + bh - bracket_len), color, thick)
+
+    # Class Label & Confidence Tag
+    label = f"{CLASS_DISPLAY_NAMES.get(class_name, class_name)} [{conf}%]"
+    (tw, th), _ = cv2.getTextSize(label, cv2.FONT_HERSHEY_SIMPLEX, 0.52, 2)
+    tag_y = max(th + 6, by - 6)
+    cv2.rectangle(img, (bx, tag_y - th - 6), (bx + tw + 10, tag_y + 2), color, -1)
+    cv2.putText(img, label, (bx + 5, tag_y - 2), cv2.FONT_HERSHEY_SIMPLEX, 0.52, (10, 15, 20), 2)
+
+
 def generate_annotated_mjpeg():
     """Generates continuous MJPEG multipart stream with real-time detection bounding boxes."""
     while True:
@@ -513,35 +639,25 @@ def generate_annotated_mjpeg():
             h, w = frame.shape[:2]
             display = cv2.resize(frame, (w * scale, h * scale), interpolation=cv2.INTER_NEAREST)
 
-            # Draw detection bounding box if active and valid
-            if act_det and act_det.get("det", False):
-                bx = act_det["bx"] * scale
-                by = act_det["by"] * scale
-                bw = act_det["bw"] * scale
-                bh = act_det["bh"] * scale
-                cls_name = act_det["cls"]
-                conf = act_det["conf"]
+            cls_name = tel.get("cls", "background")
+            conf = tel.get("conf", 0)
+            is_detected = tel.get("det", 0) == 1
 
-                color = CLASS_COLORS.get(cls_name, (0, 230, 255))
-                cv2.rectangle(display, (bx, by), (bx + bw, by + bh), color, 3)
+            # Update real-time object tracker
+            tracked_box, active_cls, active_conf, has_box = tracker.update(frame, cls_name, conf, is_detected)
 
-                # Label tag
-                label = f"{CLASS_DISPLAY_NAMES.get(cls_name, cls_name)}: {conf}%"
-                (tw, th), _ = cv2.getTextSize(label, cv2.FONT_HERSHEY_SIMPLEX, 0.55, 2)
-                cv2.rectangle(display, (bx, max(0, by - th - 8)), (bx + tw + 8, by), color, -1)
-                cv2.putText(display, label, (bx + 4, max(th + 2, by - 4)),
-                            cv2.FONT_HERSHEY_SIMPLEX, 0.55, (0, 0, 0), 2)
+            if has_box and tracked_box is not None:
+                draw_sleek_bounding_box(display, tracked_box, active_cls, active_conf, scale=scale)
             else:
-                # Faint center FOV guidance reticle
-                cx1, cy1 = 24 * scale, 24 * scale
-                cx2, cy2 = 72 * scale, 72 * scale
-                cv2.rectangle(display, (cx1, cy1), (cx2, cy2), (60, 70, 90), 1)
+                # Faint Full-FOV scan reticle
+                cv2.rectangle(display, (10, 10), (w * scale - 10, h * scale - 10), (45, 55, 75), 1)
 
             ret, jpeg = cv2.imencode('.jpg', display, [cv2.IMWRITE_JPEG_QUALITY, 85])
             if ret:
                 yield (b'--frame\r\n'
                        b'Content-Type: image/jpeg\r\n\r\n' + jpeg.tobytes() + b'\r\n')
         time.sleep(0.04)
+
 
 
 @app.route('/')

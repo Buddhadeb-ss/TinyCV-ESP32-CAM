@@ -13,13 +13,8 @@ env/
 venv/
 ENV/
 
-# IDE and OS artifacts
-.vscode/
-.idea/
-*.swp
-*.swo
-*~
-Thumbs.db
-ehthumbs.db
-Desktop.ini
-.DS_Store
+# Large media recordings
+Video_recording/
+*.mp4
+*.mkv
+*.avi

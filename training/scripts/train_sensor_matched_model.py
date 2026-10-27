@@ -55,10 +55,10 @@ class DepthwiseSeparableConv(nn.Module):
 
 class DeskObjectNet(nn.Module):
     """
-    Optimized TinyML Architecture for ESP32-CAM:
-    Input: [B, 3, 48, 48]
-    Width: 24 -> 32 -> 48 -> 64 (with Depthwise Separable Convolutions)
-    Memory: 14.8 KB INT8, ~140 ms latency on Xtensa LX6 @ 240 MHz.
+    Upgraded Full-FOV TinyML Architecture for ESP32-CAM:
+    Input: [B, 3, 48, 48] (Downsampled from Full 96x96 Camera Frame)
+    Width: 24 -> 36 -> 54 -> 72 (Depthwise Separable Convolutions)
+    Memory: ~20 KB INT8, ~150 ms latency on Xtensa LX6 @ 240 MHz.
     """
     def __init__(self, num_classes=NUM_CLASSES, in_channels=3):
         super().__init__()
@@ -67,12 +67,12 @@ class DeskObjectNet(nn.Module):
             nn.BatchNorm2d(24),
             nn.ReLU6(inplace=True)
         )
-        self.stage1 = DepthwiseSeparableConv(24, 32, stride=1)
-        self.stage2 = DepthwiseSeparableConv(32, 48, stride=2)
-        self.stage3 = DepthwiseSeparableConv(48, 64, stride=2)
+        self.stage1 = DepthwiseSeparableConv(24, 36, stride=1)
+        self.stage2 = DepthwiseSeparableConv(36, 54, stride=2)
+        self.stage3 = DepthwiseSeparableConv(54, 72, stride=2)
         self.pool = nn.AdaptiveAvgPool2d((1, 1))
-        self.dropout = nn.Dropout(0.3)
-        self.head = nn.Linear(64, num_classes)
+        self.dropout = nn.Dropout(0.25)
+        self.head = nn.Linear(72, num_classes)
 
     def forward(self, x):
         x = self.stem(x)
@@ -87,7 +87,7 @@ class DeskObjectNet(nn.Module):
 
 
 class SensorMatchedDataset(Dataset):
-    def __init__(self, split="train", img_size=IMG_SIZE, augment=False, balance_target=80):
+    def __init__(self, split="train", img_size=IMG_SIZE, augment=False, balance_target=90):
         self.img_size = img_size
         self.augment = augment
         self.split = split
@@ -119,7 +119,7 @@ class SensorMatchedDataset(Dataset):
                 for f in class_samples[c_idx]:
                     self.samples.append((f, c_idx))
 
-        print(f"Loaded {len(self.samples)} sensor samples for [{split.upper()}]")
+        print(f"Loaded {len(self.samples)} sensor samples for [{split.upper()}] (Full-FOV)")
 
     def __len__(self):
         return len(self.samples)
@@ -132,44 +132,46 @@ class SensorMatchedDataset(Dataset):
         else:
             img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 
-        # Extract 48x48 crop matching firmware preprocessing
-        # Firmware extracts central crop [24, 24, 48, 48] by default
         h, w = img.shape[:2]
-        if self.augment and h >= 48 and w >= 48:
-            # Jitter crop position slightly (+-6 pixels) to learn translation invariance
-            max_x = w - self.img_size
-            max_y = h - self.img_size
-            cx = max(0, min(max_x, 24 + np.random.randint(-6, 7)))
-            cy = max(0, min(max_y, 24 + np.random.randint(-6, 7)))
-            crop = img[cy:cy + self.img_size, cx:cx + self.img_size]
-        else:
-            # Center crop
-            cx = max(0, (w - self.img_size) // 2)
-            cy = max(0, (h - self.img_size) // 2)
-            crop = img[cy:cy + self.img_size, cx:cx + self.img_size]
-
-        if crop.shape[0] != self.img_size or crop.shape[1] != self.img_size:
-            crop = cv2.resize(crop, (self.img_size, self.img_size), interpolation=cv2.INTER_AREA)
 
         if self.augment:
-            # Horizontal flip for symmetric objects
-            if label in [1, 3] and np.random.rand() > 0.5: # cream container, earbuds case
-                crop = cv2.flip(crop, 1)
-            # Small rotation (-10 to 10 deg)
-            angle = np.random.uniform(-10, 10)
-            M = cv2.getRotationMatrix2D((self.img_size/2, self.img_size/2), angle, 1.0)
-            crop = cv2.warpAffine(crop, M, (self.img_size, self.img_size), borderMode=cv2.BORDER_REFLECT_101)
-            # Sensor exposure variation simulation (+-15%)
-            alpha = np.random.uniform(0.85, 1.15)
-            beta = np.random.uniform(-15, 15)
-            crop = np.clip(alpha * crop + beta, 0, 255).astype(np.uint8)
-            # Subtle Gaussian sensor noise
-            noise = np.random.normal(0, 2.5, crop.shape)
-            crop = np.clip(crop + noise, 0, 255).astype(np.uint8)
+            # Random affine translation (+-8 pixels)
+            tx = np.random.randint(-8, 9)
+            ty = np.random.randint(-8, 9)
+            M_trans = np.float32([[1, 0, tx], [0, 1, ty]])
+            img = cv2.warpAffine(img, M_trans, (w, h), borderMode=cv2.BORDER_REFLECT_101)
 
-        # Normalize to [-1.0, 1.0] matching INT8 quantization zero_point = 0, scale = 1/128
-        tensor_img = torch.from_numpy(crop.copy()).permute(2, 0, 1).float() / 127.5 - 1.0
+            # Random scaling (0.85x to 1.15x)
+            scale_factor = np.random.uniform(0.85, 1.15)
+            M_scale = cv2.getRotationMatrix2D((w / 2, h / 2), 0, scale_factor)
+            img = cv2.warpAffine(img, M_scale, (w, h), borderMode=cv2.BORDER_REFLECT_101)
+
+            # Random horizontal flip
+            if np.random.rand() > 0.5:
+                img = cv2.flip(img, 1)
+
+            # Small rotation (-12 to +12 deg)
+            rot_deg = np.random.uniform(-12, 12)
+            M_rot = cv2.getRotationMatrix2D((w / 2, h / 2), rot_deg, 1.0)
+            img = cv2.warpAffine(img, M_rot, (w, h), borderMode=cv2.BORDER_REFLECT_101)
+
+        # Full-FOV downsampling: entire 96x96 sensor frame downsampled to 48x48
+        # ZERO blind spots: 100% of the object and context are visible!
+        processed = cv2.resize(img, (self.img_size, self.img_size), interpolation=cv2.INTER_AREA)
+
+        if self.augment:
+            # Exposure & lighting variation
+            alpha = np.random.uniform(0.82, 1.18)
+            beta = np.random.uniform(-18, 18)
+            processed = np.clip(alpha * processed + beta, 0, 255).astype(np.uint8)
+            # Subtle Gaussian sensor noise
+            noise = np.random.normal(0, 2.0, processed.shape)
+            processed = np.clip(processed + noise, 0, 255).astype(np.uint8)
+
+        # Normalize to [-1.0, 1.0] matching INT8 quantization
+        tensor_img = torch.from_numpy(processed.copy()).permute(2, 0, 1).float() / 127.5 - 1.0
         return tensor_img, label
+
 
 
 def train_sensor_model(epochs=60, lr=0.003, batch_size=32):

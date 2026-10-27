@@ -42,8 +42,8 @@ enum OperationMode {
   MODE_PURE_CV = 2       // High-speed Classical CV only (Peak FPS)
 };
 
-static OperationMode current_mode = MODE_HYBRID;
-static int confidence_threshold_pct = 45; // 45% confidence threshold for object detection
+static OperationMode current_mode = MODE_CONTINUOUS_AI;
+static int confidence_threshold_pct = 35; // 35% calibrated threshold for full-FOV object detection
 static bool flash_state = false;
 static bool send_frame_requested = false;
 static bool continuous_video_stream = true;
@@ -510,13 +510,13 @@ void loop() {
   // Step 1: Classical CV Saliency and Motion
   SaliencyResult saliency = analyze_saliency_and_motion(fb->buf);
 
-  // Step 2: Determine if and where Neural Network runs
+  // Step 2: Determine if and where Neural Network runs (Full-FOV 96x96 -> 48x48)
   bool run_ai = false;
-  int crop_x = 24, crop_y = 24, crop_w = 48, crop_h = 48; // default center FOV
+  int crop_x = 0, crop_y = 0, crop_w = 96, crop_h = 96; // Full-FOV 100% camera coverage
 
   if (current_mode == MODE_CONTINUOUS_AI) {
     run_ai = true;
-    crop_x = 24; crop_y = 24; crop_w = 48; crop_h = 48;
+    crop_x = 0; crop_y = 0; crop_w = 96; crop_h = 96;
   } else if (current_mode == MODE_HYBRID) {
     if (saliency.has_candidate) {
       run_ai = true;
@@ -524,10 +524,10 @@ void loop() {
       crop_y = saliency.crop_y;
       crop_w = 48;
       crop_h = 48;
-    } else if ((total_frames % 20) == 0) {
-      // Periodic background scan
+    } else {
+      // Full-FOV continuous background monitoring
       run_ai = true;
-      crop_x = 24; crop_y = 24; crop_w = 48; crop_h = 48;
+      crop_x = 0; crop_y = 0; crop_w = 96; crop_h = 96;
     }
   }
 

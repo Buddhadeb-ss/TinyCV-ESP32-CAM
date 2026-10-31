@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>TinyCV-ESP32-CAM | SciPy India 2026 Poster</title>
+  <style>
+    @page {
+      size: 841mm 1189mm;
+      margin: 0;
+    }
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      width: 841mm;
+      height: 1189mm;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: #0f172a;
+      color: #1e293b;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+
+    /* HEADER */
+    header {
+      background: linear-gradient(135deg, #0b132b 0%, #1c2541 50%, #1e3a8a 100%);
+      color: #ffffff;
+      padding: 24mm 28mm 18mm 28mm;
+      border-bottom: 5mm solid #38bdf8;
+      position: relative;
+    }
+    .header-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6mm;
+    }
+    .conf-badge {
+      background: rgba(56, 189, 248, 0.2);
+      border: 1px solid #38bdf8;
+      color: #38bdf8;
+      padding: 3mm 8mm;
+      border-radius: 20px;
+      font-size: 13pt;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+    }
+    .venue-badge {
+      color: #94a3b8;
+      font-size: 13pt;
+      font-weight: 600;
+    }
+    h1.title {
+      font-size: 34pt;
+      font-weight: 900;
+      line-height: 1.15;
+      margin-bottom: 5mm;
+      letter-spacing: -0.5px;
+      color: #f8fafc;
+    }
+    h1.title span {
+      color: #38bdf8;
+    }
+    .subtitle {
+      font-size: 18pt;
+      color: #cbd5e1;
+      font-weight: 500;
+      line-height: 1.3;
+      margin-bottom: 7mm;
+    }
+    .author-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(255, 255, 255, 0.07);
+      padding: 4mm 8mm;
+      border-radius: 8px;
+      border-left: 4px solid #38bdf8;
+    }
+    .author-info {
+      font-size: 14pt;
+      color: #f1f5f9;
+    }
+    .author-info strong {
+      color: #ffffff;
+      font-size: 16pt;
+    }
+    .badges-bar {
+      display: flex;
+      gap: 4mm;
+    }
+    .pill {
+      background: #0284c7;
+      color: #ffffff;
+      padding: 2mm 5mm;
+      border-radius: 6px;
+      font-size: 11pt;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+    .pill.green { background: #059669; }
+    .pill.orange { background: #ea580c; }
+    .pill.purple { background: #7c3aed; }
+
+    /* POSTER BODY (3 COLUMNS) */
+    main {
+      flex: 1;
+      padding: 16mm 20mm;
+      background: #f1f5f9;
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 14mm;
+      height: calc(1189mm - 120mm);
+    }
+    .col {
+      display: flex;
+      flex-direction: column;
+      gap: 10mm;
+    }
+
+    /* CARD STYLING */
+    .card {
+      background: #ffffff;
+      border-radius: 10px;
+      padding: 8mm 9mm;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06);
+      border: 1px solid #e2e8f0;
+      display: flex;
+      flex-direction: column;
+    }
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: 4mm;
+      border-bottom: 2px solid #e2e8f0;
+      padding-bottom: 3mm;
+      margin-bottom: 4mm;
+    }
+    .card-num {
+      background: #1e3a8a;
+      color: #ffffff;
+      width: 9mm;
+      height: 9mm;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 13pt;
+    }
+    h2.card-title {
+      font-size: 16pt;
+      font-weight: 800;
+      color: #0f172a;
+      letter-spacing: -0.3px;
+    }
+    p, li {
+      font-size: 11pt;
+      line-height: 1.45;
+      color: #334155;
+    }
+    p { margin-bottom: 3mm; }
+    p:last-child { margin-bottom: 0; }
+    ul { margin-left: 6mm; margin-bottom: 3mm; }
+    li { margin-bottom: 2mm; }
+    strong { color: #0f172a; }
+
+    /* HIGHLIGHT BOXES */
+    .highlight-box {
+      background: #f0f9ff;
+      border-left: 4px solid #0284c7;
+      padding: 4mm 5mm;
+      border-radius: 0 6px 6px 0;
+      margin: 3mm 0;
+      font-size: 10.5pt;
+    }
+    .highlight-box.alert {
+      background: #fef2f2;
+      border-left-color: #dc2626;
+    }
+    .highlight-box.success {
+      background: #ecfdf5;
+      border-left-color: #059669;
+    }
+
+    /* TABLES */
+    table.bench-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 9.5pt;
+      margin-top: 2mm;
+    }
+    table.bench-table th, table.bench-table td {
+      padding: 2.2mm 2.5mm;
+      border: 1px solid #cbd5e1;
+      text-align: left;
+    }
+    table.bench-table th {
+      background: #1e293b;
+      color: #ffffff;
+      font-weight: 700;
+    }
+    table.bench-table tr:nth-child(even) {
+      background: #f8fafc;
+    }
+    table.bench-table tr.highlight-row {
+      background: #e0f2fe;
+      font-weight: 700;
+      color: #0369a1;
+    }
+
+    /* IMAGE CONTAINERS */
+    .img-box {
+      margin: 3mm 0;
+      text-align: center;
+      background: #f8fafc;
+      border-radius: 6px;
+      overflow: hidden;
+      border: 1px solid #e2e8f0;
+    }
+    .img-box img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+    .img-caption {
+      font-size: 9pt;
+      font-weight: 600;
+      color: #64748b;
+      padding: 1.5mm 3mm;
+      background: #f1f5f9;
+      border-top: 1px solid #e2e8f0;
+      text-align: left;
+    }
+    .img-grid-3 {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 3mm;
+      margin: 3mm 0;
+    }
+    .img-grid-3 .img-box {
+      margin: 0;
+    }
+
+    /* ARCHITECTURE DIAGRAM (SVG) */
+    .diag-container {
+      margin: 2mm 0;
+    }
+
+    /* FOOTER */
+    footer {
+      background: #0f172a;
+      color: #94a3b8;
+      padding: 10mm 28mm;
+      border-top: 3mm solid #38bdf8;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .footer-left {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5mm;
+    }
+    .footer-title {
+      font-size: 14pt;
+      font-weight: 700;
+      color: #f8fafc;
+    }
+    .footer-stack {
+      font-size: 11pt;
+      color: #38bdf8;
+      font-weight: 600;
+    }
+    .footer-right {
+      display: flex;
+      align-items: center;
+      gap: 6mm;
+    }
+    .qr-block {
+      display: flex;
+      align-items: center;
+      gap: 4mm;
+      background: rgba(255, 255, 255, 0.05);
+      padding: 3mm 5mm;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .qr-block img {
+      width: 22mm;
+      height: 22mm;
+      background: #ffffff;
+      padding: 1mm;
+      border-radius: 4px;
+    }
+    .qr-desc {
+      font-size: 10pt;
+      color: #cbd5e1;
+      line-height: 1.3;
+    }
+    .qr-desc strong {
+      color: #38bdf8;
+      display: block;
+      font-size: 11pt;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header>
+    <div class="header-top">
+      <div class="conf-badge">SciPy India 2026 • Poster Presentation</div>
+      <div class="venue-badge">Indian Institute of Technology (IIT) Madras • Dec 20, 2026</div>
+    </div>
+    <h1 class="title">TinyCV-ESP32-CAM: <span>Ultra-Lean Edge Vision & 14.8 KB INT8 Tracking</span> on a $5 Microcontroller</h1>
+    <div class="subtitle">Deploying Real-Time Multi-Object Intelligence, Full-FOV Bilinear Downsampling, and Predictive Chromatic Tracking on 320 KB SRAM</div>
+    <div class="author-bar">
+      <div class="author-info">
+        <strong>Buddhadeb Banik</strong> &nbsp;|&nbsp; Independent Researcher & Open-Source Contributor &nbsp;|&nbsp; <em>buddhadebbanik96@gmail.com</em>
+      </div>
+      <div class="badges-bar">
+        <span class="pill green">100% On-Chip AI</span>
+        <span class="pill">14.8 KB INT8 Core</span>
+        <span class="pill purple">140.7 ms Latency</span>
+        <span class="pill orange">0-Byte Leak</span>
+        <span class="pill green">100% Background Rejection</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- POSTER CONTENT: 3 COLUMNS -->
+  <main>
+
+    <!-- COLUMN 1: MOTIVATION, CONSTRAINTS & SENSOR PIPELINE -->
+    <div class="col">
+
+      <!-- CARD 1: MOTIVATION & CONSTRAINTS -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-num">1</div>
+          <h2 class="card-title">Motivation & The Embedded Silicon Triangle</h2>
+        </div>
+        <p>Deploying real-time computer vision on <strong>$5 microcontrollers</strong> (Espressif ESP32-CAM) is constrained by severe silicon boundaries. Standard deep-learning detectors (YOLO, SSD, MobileNet) require megabytes of SRAM and teraflops of compute, rendering them infeasible for tiny edge nodes.</p>
+        
+        <div class="diag-container">
+          <svg viewBox="0 0 520 180" style="width: 100%; height: auto; font-family: sans-serif;">
+            <defs>
+              <linearGradient id="boxGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#1e3a8a"/>
+                <stop offset="100%" stop-color="#0284c7"/>
+              </linearGradient>
+            </defs>
+            <!-- Triangle Boxes -->
+            <rect x="180" y="10" width="160" height="42" rx="6" fill="url(#boxGrad)" stroke="#38bdf8" stroke-width="1.5"/>
+            <text x="260" y="28" fill="#fff" font-size="11" font-weight="bold" text-anchor="middle">Compute Constraint</text>
+            <text x="260" y="42" fill="#cbd5e1" font-size="9" text-anchor="middle">240 MHz Dual Xtensa LX6</text>
+
+            <rect x="15" y="120" width="160" height="42" rx="6" fill="url(#boxGrad)" stroke="#38bdf8" stroke-width="1.5"/>
+            <text x="95" y="138" fill="#fff" font-size="11" font-weight="bold" text-anchor="middle">Memory Constraint</text>
+            <text x="95" y="152" fill="#cbd5e1" font-size="9" text-anchor="middle">328 KB Usable SRAM</text>
+
+            <rect x="345" y="120" width="160" height="42" rx="6" fill="url(#boxGrad)" stroke="#38bdf8" stroke-width="1.5"/>
+            <text x="425" y="138" fill="#fff" font-size="11" font-weight="bold" text-anchor="middle">Bus Bandwidth</text>
+            <text x="425" y="152" fill="#cbd5e1" font-size="9" text-anchor="middle">SPI PSRAM @ 40 MHz</text>
+
+            <!-- Connecting Lines -->
+            <line x1="220" y1="52" x2="135" y2="120" stroke="#64748b" stroke-width="1.5" stroke-dasharray="3,3"/>
+            <line x1="300" y1="52" x2="385" y2="120" stroke="#64748b" stroke-width="1.5" stroke-dasharray="3,3"/>
+            <line x1="175" y1="141" x2="345" y2="141" stroke="#64748b" stroke-width="1.5" stroke-dasharray="3,3"/>
+
+            <!-- Center Solution Badge -->
+            <circle cx="260" cy="115" r="32" fill="#059669" stroke="#fff" stroke-width="2"/>
+            <text x="260" y="112" fill="#fff" font-size="10" font-weight="bold" text-anchor="middle">TinyCV</text>
+            <text x="260" y="124" fill="#d1fae5" font-size="8" text-anchor="middle">14.8 KB Core</text>
+          </svg>
+        </div>
+
+        <div class="highlight-box">
+          <strong>The Engineering Challenge:</strong> Run high-resolution streaming, semantic recognition, and smooth spatial tracking simultaneously with <strong>zero cloud reliance</strong> and <strong>0-byte memory leak</strong>.
+        </div>
+      </div>
+
+      <!-- CARD 2: MEMORY PARTITIONING & ZERO-LEAK -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-num">2</div>
+          <h2 class="card-title">Memory Partitioning & Zero-SRAM Starvation</h2>
+        </div>
+        <p>Allocating tensors in internal SRAM causes immediate FreeRTOS heap exhaustion. We decoupled memory regions into distinct silicon partitions:</p>
+        <ul>
+          <li><strong>Internal High-Speed SRAM (328 KB):</strong> Reserved strictly for time-critical FreeRTOS kernel tasks, WiFi/Bluetooth stacks, and DMA camera buffers.</li>
+          <li><strong>External SPI PSRAM (4 MB):</strong> Houses the <strong>96 KB Tensor Arena</strong> and double frame buffers using <code>MALLOC_CAP_SPIRAM</code>.</li>
+          <li><strong>Zero-Leak Guarantee:</strong> Sustained stress testing over thousands of inference cycles confirms exactly <strong>0 bytes leaked</strong>.</li>
+        </ul>
+        <div class="highlight-box success">
+          <strong>Deterministic Execution:</strong> 140.7 ms fixed inference window; prevents robot/industrial servo instability and buffer overruns.
+        </div>
+      </div>
+
+      <!-- CARD 3: SENSOR-MATCHED DATASET -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-num">3</div>
+          <h2 class="card-title">Sensor-Matched Dataset Engineering</h2>
+        </div>
+        <p><strong>The Domain Shift Problem:</strong> Training neural models on high-resolution smartphone/DSLR photos resulted in catastrophic real-world failure due to OV3660 fixed-pattern noise, rolling shutter distortion, and Bayer color balance shifts.</p>
+        <p><strong>Solution:</strong> We developed an automated Python capture studio (<code>capture_tool.py</code> via <code>pyserial</code> and <code>opencv-python</code>) streaming raw frames directly from the physical OV3660 CMOS sensor.</p>
+        
+        <div class="img-box">
+          <img src="images/sensor_clarity_240x240.png" alt="240x240 Sensor Clarity">
+          <div class="img-caption">Figure 1: Raw 240x240 OV3660 capture showing 6.25x pixel detail, text legibility, and sharp edges compared to legacy 96x96 downsampling.</div>
+        </div>
+        <p>Curated <strong>581 verified sensor-native captures</strong> across 6 balanced classes with background hard negatives.</p>
+      </div>
+
+    </div>
+
+    <!-- COLUMN 2: ARCHITECTURE, QUANTIZATION & RESULTS -->
+    <div class="col">
+
+      <!-- CARD 4: BIMODAL ARCHITECTURE -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-num">4</div>
+          <h2 class="card-title">Bimodal Architecture: Semantic & Predictive Paths</h2>
+        </div>
+        <p>Rather than forcing an expensive monolithic architecture, TinyCV decomposes edge vision into two complementary, asynchronous pipelines:</p>
+        
+        <div class="diag-container">
+          <svg viewBox="0 0 520 170" style="width: 100%; height: auto; font-family: sans-serif;">
+            <!-- Input Frame -->
+            <rect x="10" y="55" width="110" height="50" rx="6" fill="#1e293b" stroke="#38bdf8" stroke-width="1.5"/>
+            <text x="65" y="77" fill="#fff" font-size="10" font-weight="bold" text-anchor="middle">OV3660 Sensor</text>
+            <text x="65" y="93" fill="#38bdf8" font-size="9" text-anchor="middle">240x240 RGB565</text>
+
+            <!-- Arrows -->
+            <path d="M 120 70 L 165 40" fill="none" stroke="#64748b" stroke-width="2" marker-end="url(#arrow)"/>
+            <path d="M 120 90 L 165 120" fill="none" stroke="#64748b" stroke-width="2"/>
+
+            <!-- Fast Path -->
+            <rect x="165" y="15" width="165" height="48" rx="6" fill="#0284c7" stroke="#38bdf8" stroke-width="1.5"/>
+            <text x="247" y="34" fill="#fff" font-size="10" font-weight="bold" text-anchor="middle">Fast Path: Predictive CV</text>
+            <text x="247" y="50" fill="#e0f2fe" font-size="8.5" text-anchor="middle">HSV Multi-Band + Momentum (&lt;1 ms)</text>
+
+            <!-- Semantic Path -->
+            <rect x="165" y="95" width="165" height="48" rx="6" fill="#7c3aed" stroke="#c084fc" stroke-width="1.5"/>
+            <text x="247" y="114" fill="#fff" font-size="10" font-weight="bold" text-anchor="middle">Semantic: DeskObjectNet</text>
+            <text x="247" y="130" fill="#f3e8ff" font-size="8.5" text-anchor="middle">14.8 KB INT8 CNN (140.7 ms)</text>
+
+            <!-- Fusion Box -->
+            <rect x="365" y="55" width="145" height="50" rx="6" fill="#059669" stroke="#34d399" stroke-width="1.5"/>
+            <text x="437" y="77" fill="#fff" font-size="10" font-weight="bold" text-anchor="middle">Bimodal Fusion</text>
+            <text x="437" y="93" fill="#d1fae5" font-size="8.5" text-anchor="middle">12 FPS Stream + 100% ID</text>
+
+            <path d="M 330 40 L 365 70" fill="none" stroke="#64748b" stroke-width="2"/>
+            <path d="M 330 120 L 365 90" fill="none" stroke="#64748b" stroke-width="2"/>
+          </svg>
+        </div>
+
+        <ul>
+          <li><strong>Full-FOV Bilinear Downsampling:</strong> Subsamples entire 240x240 image into 48x48 tensor without center-crop blind spots (&lt;0.2 ms).</li>
+          <li><strong>Predictive Tracker:</strong> Merges physical color priors with exponential velocity momentum ($\alpha = 0.35$) for jitter-free bounding box tracking.</li>
+        </ul>
+      </div>
+
+      <!-- CARD 5: INT8 QUANTIZATION -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-num">5</div>
+          <h2 class="card-title">INT8 Quantization & Hardware Acceleration</h2>
+        </div>
+        <p>Using TensorFlow Lite post-training full-integer quantization, all weights and activations were converted from Float32 to signed 8-bit integers:</p>
+        <ul>
+          <li><strong>Model Footprint:</strong> Compressed to only <strong>16,384 bytes</strong> (fits completely in L2 cache / PSRAM).</li>
+          <li><strong>Assembly Kernels:</strong> Executed using Espressif's <code>esp-nn</code> vectorized SIMD routines on Xtensa LX6.</li>
+          <li><strong>Serial Protocol:</strong> Framed binary JPEGs transmitted with 4-byte sync header (<code>0xAA 0x55 0xAA 0x55</code>) at 460,800 baud, sustaining 12 FPS video.</li>
+        </ul>
+      </div>
+
+      <!-- CARD 6: PHYSICAL TRACKING SHOWCASE -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-num">6</div>
+          <h2 class="card-title">Live Hardware Physical Tracking Results</h2>
+        </div>
+        <p>Unedited captures from live sessions on AI-Thinker ESP32-CAM (OV3660 sensor @ COM8):</p>
+        
+        <div class="img-grid-3">
+          <div class="img-box">
+            <img src="images/demo_mouse_tracking.png" alt="Mouse Tracking">
+            <div class="img-caption">Mouse: <strong>97%</strong></div>
+          </div>
+          <div class="img-box">
+            <img src="images/demo_earbuds_tracking.png" alt="Earbuds Tracking">
+            <div class="img-caption">Earbuds: <strong>98%</strong></div>
+          </div>
+          <div class="img-box">
+            <img src="images/demo_gluestick_tracking.png" alt="Glue Stick Tracking">
+            <div class="img-caption">Glue Stick: <strong>98%</strong></div>
+          </div>
+        </div>
+
+        <div class="highlight-box success">
+          <strong>Held-out Test Performance:</strong> 100.0% accuracy (84/84 test images), 0% false positive background rate, and verified real-time bounding box lock.
+        </div>
+      </div>
+
+    </div>
+
+    <!-- COLUMN 3: FORENSICS, BENCHMARKS & APPLICATIONS -->
+    <div class="col">
+
+      <!-- CARD 7: FORENSIC FAILURE ANALYSIS -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-num">7</div>
+          <h2 class="card-title">Forensic Failure Analysis ("What Failed & Why")</h2>
+        </div>
+        <p>Transparent analysis of engineering hurdles solved during development:</p>
+        
+        <div class="highlight-box alert">
+          <strong>Failure 2: The 75% FOV Center-Crop Blind Spot</strong><br>
+          Blindly cropping 48x48 center pixels missed objects held off-axis.
+        </div>
+        <div class="img-box">
+          <img src="images/failure_case_old_crop.png" alt="Crop Failure">
+          <div class="img-caption">Figure 2: User holding cream container in bottom-left corner; legacy center-crop saw only empty laptop keyboard. Resolved via Full-FOV Bilinear Downsampling.</div>
+        </div>
+
+        <div class="highlight-box alert">
+          <strong>Failure 6: Demo Recording Keyboard False Positive</strong><br>
+          In video test, pointing camera at laptop keyboard triggered <em>Mouse [97%]</em>. Forensic audit revealed 10 keyboard photos had been misfiled into the <code>mouse/</code> training folder! Reclassified as <strong>background hard negatives</strong>; retraining restored 100% test accuracy.
+        </div>
+      </div>
+
+      <!-- CARD 8: BENCHMARKS TABLE -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-num">8</div>
+          <h2 class="card-title">Silicon Benchmarks & Architecture Comparison</h2>
+        </div>
+        
+        <table class="bench-table">
+          <thead>
+            <tr>
+              <th>Architecture</th>
+              <th>Model Size</th>
+              <th>Latency</th>
+              <th>RAM Used</th>
+              <th>Hardware BOM</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>YOLO-Tiny Edge</td>
+              <td>~6.5 MB</td>
+              <td>2,400 ms</td>
+              <td>&gt;15 MB</td>
+              <td>&gt;$45 (RPi 4)</td>
+            </tr>
+            <tr>
+              <td>Cloud Streaming</td>
+              <td>N/A (Server)</td>
+              <td>~450 ms</td>
+              <td>Server RAM</td>
+              <td>Cloud Bill</td>
+            </tr>
+            <tr>
+              <td>Pure Classical CV</td>
+              <td>0 KB</td>
+              <td>25 ms</td>
+              <td>~40 KB</td>
+              <td>&lt;$5 (ESP32)</td>
+            </tr>
+            <tr class="highlight-row">
+              <td><strong>TinyCV (Ours)</strong></td>
+              <td><strong>14.8 KB</strong></td>
+              <td><strong>140.7 ms</strong></td>
+              <td><strong>96 KB PSRAM</strong></td>
+              <td><strong>&lt;$5 (ESP32-CAM)</strong></td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="highlight-box" style="margin-top: 3mm;">
+          <strong>Bill-of-Materials:</strong> Over <strong>9x lower hardware cost</strong> than single-board computers (Raspberry Pi/Coral) with zero recurring monthly cloud fees.
+        </div>
+      </div>
+
+      <!-- CARD 9: APPLICATIONS & REPRODUCIBILITY -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-num">9</div>
+          <h2 class="card-title">Real-World Applications & Scientific Python Stack</h2>
+        </div>
+        <ul>
+          <li><strong>Autonomous Micro-Robotics:</strong> Jitter-free visual servoing without GPU payloads.</li>
+          <li><strong>Smart Laboratory Workbenches:</strong> Local tracking of reagent tubes without video leaving facilities.</li>
+          <li><strong>Low-Cost Industrial Sorting:</strong> Multi-station assembly verification for under $100.</li>
+        </ul>
+        
+        <p style="margin-top: 2mm;"><strong>100% Open-Source & Reproducible Stack:</strong></p>
+        <p style="font-size: 10pt; color: #475569;">Python 3.10 • NumPy • PyTorch • OpenCV • TensorFlow Lite Micro • Flask • PySerial • PlatformIO • FreeRTOS • esp-nn</p>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-left">
+      <div class="footer-title">TinyCV-ESP32-CAM • SciPy India 2026 Conference Poster</div>
+      <div class="footer-stack">Built with the Scientific Python Ecosystem • 100% Free & Open Source Software (MIT License)</div>
+    </div>
+    <div class="footer-right">
+      <div class="qr-block">
+        <img src="images/qr_github.png" alt="GitHub QR Code">
+        <div class="qr-desc">
+          <strong>Scan for Open Code & HD Video:</strong>
+          github.com/Buddhadeb-ss/TinyCV-ESP32-CAM<br>
+          Includes full 68s hardware video demo
+        </div>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>
